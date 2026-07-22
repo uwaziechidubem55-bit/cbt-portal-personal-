@@ -1,0 +1,21 @@
+name: Deploy CBT Portal
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
+      - name: Zip Project
+        run: zip -r cbt-portal-personal.zip index.html README.md
+        
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cbt-portal-personal
+          path: cbt-portal-personal.zip
