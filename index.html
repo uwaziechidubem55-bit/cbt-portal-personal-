@@ -9,8 +9,8 @@
   <script>pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';</script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
-    * { font-family: 'Inter', system-ui, sans-serif; }
-    body { transition: background 0.3s, color 0.3s; }
+    * { font-family: 'Inter', system-ui, sans-serif; box-sizing: border-box; }
+    body { transition: background 0.3s, color 0.3s; margin: 0; }
     body.dark { background: #0f172a; color: #e2e8f0; }
     body.light { background: #f1f5f9; color: #1e293b; }
     .hide { display: none !important; }
@@ -25,52 +25,67 @@
     .btn-success:hover:not(:disabled) { background: #16a34a; }
     .btn-danger { background: #ef4444; color: white; }
     .btn-danger:hover:not(:disabled) { background: #dc2626; }
+    .btn-warning { background: #f59e0b; color: #1e293b; }
+    .btn-warning:hover { background: #d97706; }
     .btn-outline { background: transparent; border: 1px solid #64748b; color: #94a3b8; }
     .btn-outline:hover { background: #334155; }
-    input, textarea, select { width: 100%; padding: 10px 14px; border-radius: 8px; font-size: 14px; outline: none; transition: all 0.2s; box-sizing: border-box; }
+    .btn-game { background: linear-gradient(135deg, #8b5cf6, #ec4899); color: white; }
+    .btn-game:hover { transform: scale(1.03); }
+    input, textarea, select { width: 100%; padding: 10px 14px; border-radius: 8px; font-size: 14px; outline: none; transition: all 0.2s; }
     body.dark input, body.dark textarea, body.dark select { background: #0f172a; border: 1px solid #334155; color: #e2e8f0; }
     body.light input, body.light textarea, body.light select { background: white; border: 1px solid #cbd5e1; color: #1e293b; }
     input:focus, textarea:focus, select:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.15); }
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: 1000; padding: 16px; }
-    .modal-content { border-radius: 12px; padding: 24px; width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto; }
+    .modal-content { border-radius: 12px; padding: 24px; width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto; }
     body.dark .modal-content { background: #1e293b; border: 1px solid #334155; }
     body.light .modal-content { background: white; }
-    .tag { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+    .tag { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; }
     .badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
     .progress-bar { height: 8px; border-radius: 4px; overflow: hidden; }
     body.dark .progress-bar { background: #334155; }
     body.light .progress-bar { background: #e2e8f0; }
-    .progress-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #3b82f6, #22c55e); transition: width 0.3s; }
+    .progress-fill { height: 100%; border-radius: 4px; transition: width 0.4s; }
     .toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 20px; border-radius: 8px; font-weight: 500; z-index: 2000; animation: slideUp 0.3s ease; max-width: 360px; }
     @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-    .option-btn { display: block; width: 100%; padding: 14px 16px; text-align: left; border-radius: 8px; cursor: pointer; font-size: 14px; transition: all 0.2s; border: 2px solid transparent; }
+    .option-btn { display: block; width: 100%; padding: 14px 16px; text-align: left; border-radius: 8px; cursor: pointer; font-size: 14px; transition: all 0.2s; border: 2px solid transparent; margin-bottom: 6px; }
     body.dark .option-btn { background: #0f172a; color: #e2e8f0; }
     body.light .option-btn { background: #f8fafc; color: #1e293b; }
     .option-btn:hover { border-color: #3b82f6; }
     .option-btn.selected { border-color: #22c55e; background: rgba(34,197,94,0.1); }
     .option-btn.wrong { border-color: #ef4444; background: rgba(239,68,68,0.1); }
     .option-btn.correct { border-color: #22c55e; background: rgba(34,197,94,0.15); }
+    .sub-q { margin-left: 24px; padding-left: 16px; border-left: 2px solid #475569; margin-top: 12px; }
+    .sub-q-letter { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 50%; font-size: 12px; font-weight: 700; margin-right: 8px; }
+    body.dark .sub-q-letter { background: #334155; color: #94a3b8; }
+    body.light .sub-q-letter { background: #e2e8f0; color: #64748b; }
+    .game-card { cursor: pointer; border-radius: 12px; padding: 24px; text-align: center; transition: all 0.2s; }
+    .game-card:hover { transform: translateY(-4px); }
+    .flash-wrong { animation: flashRed 0.5s; }
+    .flash-correct { animation: flashGreen 0.5s; }
+    @keyframes flashRed { 0%,100%{background:transparent} 50%{background:rgba(239,68,68,0.2)} }
+    @keyframes flashGreen { 0%,100%{background:transparent} 50%{background:rgba(34,197,94,0.2)} }
+    .countdown-ring { width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 800; border: 4px solid; transition: border-color 0.5s; margin: 0 auto; }
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: #475569; border-radius: 3px; }
+    @media(max-width:640px){ .btn { font-size: 13px; padding: 8px 14px; } .card { padding: 14px; } }
   </style>
 </head>
 <body class="dark">
-  <!-- ===== TOAST CONTAINER ===== -->
   <div id="toastContainer"></div>
 
-  <!-- ===== LOGIN PAGE ===== -->
+  <!-- ===== LOGIN ===== -->
   <div id="loginPage" class="min-h-screen flex items-center justify-center p-4">
     <div class="card w-full max-w-md">
       <div class="text-center mb-6">
-        <h1 class="text-2xl font-extrabold">📚 My CBT Portal</h1>
-        <p class="opacity-60 text-sm mt-1">100% Personal — Exam twice a year</p>
+        <h1 class="text-2xl font-extrabold">🎓 Uni CBT Portal</h1>
+        <p class="opacity-60 text-sm mt-1">University-Standard Exams — Twice a Year</p>
       </div>
       <div id="loginForm">
-        <input id="loginName" placeholder="Your Name" class="mb-3" autocomplete="name">
+        <input id="loginName" placeholder="Your Full Name" class="mb-3" autocomplete="name">
         <input id="loginPass" type="password" placeholder="Password (min 4 chars)" class="mb-3" autocomplete="new-password">
         <button onclick="handleLogin()" class="btn btn-primary w-full text-base py-3">Login / Create Account</button>
-        <p class="text-xs opacity-50 text-center mt-3">Account is saved locally on this browser only</p>
+        <p class="text-xs opacity-50 text-center mt-3">Local only — no internet needed after load</p>
       </div>
       <div class="flex justify-end mt-4">
         <button onclick="toggleTheme()" class="btn btn-outline text-xs py-1 px-3" id="themeToggle">🌙 Dark</button>
@@ -79,64 +94,145 @@
   </div>
 
   <!-- ===== DASHBOARD ===== -->
-  <div id="dashboardPage" class="hide min-h-screen p-4 md:p-6 max-w-5xl mx-auto">
-    <div class="flex items-center justify-between mb-6">
+  <div id="dashboardPage" class="hide min-h-screen p-4 md:p-6 max-w-6xl mx-auto">
+    <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
       <div>
-        <h1 class="text-xl md:text-2xl font-extrabold">My Courses, <span id="userNameDisplay" class="text-blue-400"></span> 👋</h1>
+        <h1 class="text-xl md:text-2xl font-extrabold">📚 My Courses, <span id="userNameDisplay" class="text-blue-400"></span></h1>
         <p class="text-sm opacity-50 mt-0.5" id="courseCount">0 courses</p>
       </div>
-      <div class="flex gap-2 items-center">
+      <div class="flex gap-2 items-center flex-wrap">
         <button onclick="toggleTheme()" class="btn btn-outline text-xs py-1 px-3" id="themeToggle2">🌙</button>
+        <button onclick="showGamesPage()" class="btn btn-game text-sm flex items-center gap-1">🎮 <span class="hidden sm:inline">Games</span></button>
         <button onclick="showAddCourseModal()" class="btn btn-success text-sm flex items-center gap-1">➕ <span class="hidden sm:inline">Add Course</span></button>
         <button onclick="logout()" class="btn btn-danger text-sm">Logout</button>
       </div>
     </div>
 
-    <div id="emptyState" class="text-center py-20 opacity-50">
+    <div id="emptyState" class="text-center py-16 opacity-50">
       <div class="text-5xl mb-4">📖</div>
       <p class="text-lg font-medium">No courses yet</p>
-      <p class="text-sm mt-1">Click "Add Course" to get started</p>
+      <p class="text-sm mt-1">Click "Add Course" to upload a PDF or paste notes</p>
     </div>
 
     <div id="courseGrid" class="hide grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
 
-    <!-- Quick Stats -->
-    <div id="statsBar" class="hide mt-6 grid grid-cols-3 gap-4 text-center">
+    <div id="statsBar" class="hide mt-6 grid grid-cols-3 sm:grid-cols-5 gap-3 text-center">
       <div class="card"><p class="text-2xl font-bold" id="statCourses">0</p><p class="text-xs opacity-50">Courses</p></div>
-      <div class="card"><p class="text-2xl font-bold" id="statExams">0</p><p class="text-xs opacity-50">Exams Taken</p></div>
+      <div class="card"><p class="text-2xl font-bold" id="statExams">0</p><p class="text-xs opacity-50">Exams</p></div>
       <div class="card"><p class="text-2xl font-bold" id="statAvg">--</p><p class="text-xs opacity-50">Avg Score</p></div>
+      <div class="card"><p class="text-2xl font-bold" id="statGames">0</p><p class="text-xs opacity-50">Games Played</p></div>
+      <div class="card"><p class="text-2xl font-bold" id="statStreak">0</p><p class="text-xs opacity-50">Best Streak</p></div>
+    </div>
+  </div>
+
+  <!-- ===== GAMES PAGE ===== -->
+  <div id="gamesPage" class="hide min-h-screen p-4 md:p-6 max-w-6xl mx-auto">
+    <div class="flex items-center justify-between mb-4">
+      <h1 class="text-xl md:text-2xl font-extrabold">🎮 Educational Games</h1>
+      <button onclick="goDashboard()" class="btn btn-outline text-sm">← Back</button>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+      <!-- Lightning Round -->
+      <div class="game-card card" onclick="startLightningRound()" style="border:2px solid #f59e0b">
+        <div class="text-5xl mb-3">⚡</div>
+        <h3 class="font-bold text-lg mb-1">Lightning Round</h3>
+        <p class="text-sm opacity-70">10 seconds per question. Think fast!</p>
+        <div class="mt-3 flex gap-2 justify-center">
+          <span class="tag bg-yellow-500 text-black">10s</span>
+          <span class="tag bg-purple-500 text-white">Rapid</span>
+        </div>
+      </div>
+
+      <!-- True/False Rush -->
+      <div class="game-card card" onclick="startTrueFalseRush()" style="border:2px solid #22c55e">
+        <div class="text-5xl mb-3">✅</div>
+        <h3 class="font-bold text-lg mb-1">True / False Rush</h3>
+        <p class="text-sm opacity-70">Quick statements. Is it true or false?</p>
+        <div class="mt-3 flex gap-2 justify-center">
+          <span class="tag bg-green-500 text-white">T/F</span>
+          <span class="tag bg-blue-500 text-white">Speed</span>
+        </div>
+      </div>
+
+      <!-- Match Challenge -->
+      <div class="game-card card" onclick="startMatchChallenge()" style="border:2px solid #8b5cf6">
+        <div class="text-5xl mb-3">🧩</div>
+        <h3 class="font-bold text-lg mb-1">Match Challenge</h3>
+        <p class="text-sm opacity-70">Match terms to their definitions</p>
+        <div class="mt-3 flex gap-2 justify-center">
+          <span class="tag bg-purple-500 text-white">Match</span>
+          <span class="tag bg-pink-500 text-white">Fun</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Stats -->
+    <div class="card mb-4">
+      <h3 class="font-bold mb-3">🏆 Your Game Records</h3>
+      <div id="gameStatsContent" class="text-sm opacity-70">Play a game to see your records!</div>
+    </div>
+
+    <!-- Game Area (hidden until game starts) -->
+    <div id="gameArea" class="hide">
+      <div class="card mb-4 text-center">
+        <div id="gameCountdown" class="countdown-ring mb-3">10</div>
+        <p class="text-sm opacity-50" id="gameTimerLabel">seconds remaining</p>
+        <div class="mt-4">
+          <p class="text-lg font-bold mb-4" id="gameQuestion">Question appears here</p>
+          <div id="gameOptions" class="space-y-2 max-w-md mx-auto"></div>
+        </div>
+        <div class="mt-4 flex justify-between items-center">
+          <span id="gameScore" class="font-bold text-lg">Score: 0</span>
+          <span id="gameStreak" class="text-sm opacity-70">Streak: 0 🔥</span>
+        </div>
+        <div class="mt-2 flex justify-center gap-1" id="gameProgressDots"></div>
+      </div>
+      <button onclick="endGame()" class="btn btn-danger">End Game</button>
+    </div>
+
+    <!-- Game Results -->
+    <div id="gameResults" class="hide card text-center">
+      <div class="text-5xl mb-3" id="gameResultIcon">🏆</div>
+      <h2 class="text-2xl font-bold mb-1" id="gameResultTitle">Game Over!</h2>
+      <p class="text-lg mb-3" id="gameResultScore">Score: 0</p>
+      <div class="grid grid-cols-3 gap-3 mb-4">
+        <div><p class="text-xl font-bold" id="gameRCorrect">0</p><p class="text-xs opacity-50">Correct</p></div>
+        <div><p class="text-xl font-bold" id="gameRWrong">0</p><p class="text-xs opacity-50">Wrong</p></div>
+        <div><p class="text-xl font-bold" id="gameRPct">0%</p><p class="text-xs opacity-50">Accuracy</p></div>
+      </div>
+      <div class="flex gap-2 justify-center">
+        <button onclick="endGame()" class="btn btn-outline">Back</button>
+        <button onclick="restartGame()" class="btn btn-primary">Play Again</button>
+      </div>
     </div>
   </div>
 
   <!-- ===== ADD COURSE MODAL ===== -->
   <div id="addCourseModal" class="modal-overlay hide">
     <div class="modal-content">
-      <h2 class="text-xl font-bold mb-4">Add New Course</h2>
-
-      <div class="mb-4">
+      <h2 class="text-xl font-bold mb-4">➕ Add New Course</h2>
+      <div class="mb-3">
         <label class="block text-sm font-medium mb-1">Course Name</label>
-        <input id="courseNameInput" placeholder="e.g. CHM 101, PHY 102">
+        <input id="courseNameInput" placeholder="e.g. MTH 101, PHY 102, CHM 101">
       </div>
-
       <p class="text-sm font-medium mb-2">Choose Method:</p>
 
-      <!-- Option 1: PDF Upload -->
       <div class="card mb-3">
         <p class="font-medium text-sm mb-2">Option 1: Upload PDF</p>
         <input type="file" id="pdfUpload" accept=".pdf" class="text-sm mb-2">
         <div id="pdfStatus" class="text-xs opacity-50 mb-2"></div>
-        <button onclick="parsePDF()" class="btn btn-primary text-sm w-full">Generate from PDF</button>
+        <button onclick="parsePDF()" class="btn btn-primary text-sm w-full">📄 Generate from PDF</button>
       </div>
 
-      <!-- Option 2: Paste Outline -->
       <div class="card mb-4">
         <p class="font-medium text-sm mb-2">Option 2: Paste Course Outline</p>
-        <textarea id="outlineInput" rows="4" placeholder="Paste your course outline or notes here..." class="mb-2"></textarea>
-        <button onclick="generateFromOutline()" class="btn btn-primary text-sm w-full">Generate from Outline</button>
+        <textarea id="outlineInput" rows="4" placeholder="Paste your course outline, notes, or lecture text here..." class="mb-2"></textarea>
+        <button onclick="generateFromOutline()" class="btn btn-primary text-sm w-full">📝 Generate from Outline</button>
       </div>
 
       <div class="flex gap-2 justify-end">
-        <button onclick="closeAddCourseModal()" class="btn btn-outline">Close</button>
+        <button onclick="closeAddCourseModal()" class="btn btn-outline">Cancel</button>
       </div>
     </div>
   </div>
@@ -144,15 +240,16 @@
   <!-- ===== EXAM SETTINGS MODAL ===== -->
   <div id="examSettingsModal" class="modal-overlay hide">
     <div class="modal-content">
-      <h2 class="text-xl font-bold mb-1">Exam Settings for <span id="examCourseName" class="text-blue-400"></span></h2>
-      <p class="text-xs opacity-50 mb-4">Configure how this exam works</p>
+      <h2 class="text-xl font-bold mb-1">📋 Exam Settings</h2>
+      <p class="text-sm text-blue-400 font-medium mb-4" id="examCourseName"></p>
 
       <div class="mb-3">
-        <label class="block text-sm font-medium mb-1">Exam Type</label>
+        <label class="block text-sm font-medium mb-1">Exam Format</label>
         <select id="examType">
           <option value="objective">Objective (Multiple Choice)</option>
-          <option value="theory">Theory (Written)</option>
-          <option value="mixed">Mixed (Objective + Theory)</option>
+          <option value="theory">Theory (Written Answers)</option>
+          <option value="hierarchical">Hierarchical (Questions with sub-questions)</option>
+          <option value="mixed">Mixed (All types combined)</option>
         </select>
       </div>
 
@@ -166,16 +263,17 @@
         <input type="number" id="examDuration" value="30" min="1" max="180">
       </div>
 
-      <div class="mb-4" id="theoryFormatGroup">
-        <label class="block text-sm font-medium mb-1">Theory Answer Format</label>
-        <select id="theoryFormat">
-          <option value="text">Text Area</option>
-          <option value="abc">A, B, C Options</option>
+      <div class="mb-4">
+        <label class="block text-sm font-medium mb-1">Difficulty</label>
+        <select id="examDifficulty">
+          <option value="university">🎓 University Standard</option>
+          <option value="hard">🔥 Lecturer Level (Hard)</option>
+          <option value="expert">⚡ Expert / Professional</option>
         </select>
       </div>
 
       <div class="flex gap-2">
-        <button onclick="startExam()" class="btn btn-success flex-1">Start Exam</button>
+        <button onclick="startExam()" class="btn btn-success flex-1">▶ Start Exam</button>
         <button onclick="closeExamSettings()" class="btn btn-outline">Back</button>
       </div>
     </div>
@@ -183,8 +281,7 @@
 
   <!-- ===== EXAM PAGE ===== -->
   <div id="examPage" class="hide min-h-screen p-4 md:p-6 max-w-4xl mx-auto">
-    <!-- Exam Header -->
-    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
       <div>
         <h2 class="text-lg font-bold" id="examHeaderTitle">Exam</h2>
         <p class="text-xs opacity-50" id="examProgress">Question 1 of 10</p>
@@ -194,37 +291,26 @@
           <div class="text-xl font-bold" id="timerDisplay">30:00</div>
           <p class="text-xs opacity-50">remaining</p>
         </div>
-        <button onclick="saveExamProgress()" class="btn btn-outline text-sm py-1 px-3" title="Ctrl+S">💾 Save</button>
+        <button onclick="saveExamProgress()" class="btn btn-outline text-sm py-1 px-3" title="Ctrl+S">💾</button>
       </div>
     </div>
 
-    <!-- Progress Bar -->
-    <div class="progress-bar mb-4"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <div class="progress-bar mb-3"><div class="progress-fill" id="progressFill" style="width:0%;background:linear-gradient(90deg,#3b82f6,#22c55e)"></div></div>
 
-    <!-- Question Area -->
     <div id="questionArea" class="card mb-4">
       <div class="flex justify-between items-start mb-3">
-        <span class="badge bg-blue-500 text-white" id="qNumBadge">Q1</span>
-        <span class="tag bg-yellow-500 text-black" id="qTypeBadge">Objective</span>
+        <span class="badge" id="qNumBadge" style="background:#3b82f6;color:white">Q1</span>
+        <span class="tag" id="qTypeBadge" style="background:#f59e0b;color:#1e293b">Objective</span>
       </div>
       <p class="text-lg font-medium mb-4" id="questionText">Loading question...</p>
 
-      <!-- Objective Options -->
-      <div id="objectiveOptions" class="space-y-2"></div>
+      <!-- Main question answer area -->
+      <div id="questionAnswerArea"></div>
 
-      <!-- Theory Answer -->
-      <div id="theoryAnswerArea" class="hide">
-        <label class="block text-sm font-medium mb-1">Your Answer:</label>
-        <textarea id="theoryAnswer" rows="6" placeholder="Type your answer here..." class="mb-2"></textarea>
-        <div id="abcOptions" class="hide space-y-2">
-          <button data-val="A" class="option-btn">A: <input id="ans_a" placeholder="Enter option A" class="mt-1 text-sm"></button>
-          <button data-val="B" class="option-btn">B: <input id="ans_b" placeholder="Enter option B" class="mt-1 text-sm"></button>
-          <button data-val="C" class="option-btn">C: <input id="ans_c" placeholder="Enter option C" class="mt-1 text-sm"></button>
-        </div>
-      </div>
+      <!-- Sub-questions container (for hierarchical) -->
+      <div id="subQuestionsContainer" class="space-y-3"></div>
     </div>
 
-    <!-- Question Navigation -->
     <div class="flex flex-wrap items-center justify-between gap-3">
       <div class="flex gap-2">
         <button onclick="prevQuestion()" class="btn btn-outline">← Prev</button>
@@ -232,11 +318,10 @@
       </div>
       <div class="flex gap-2">
         <button onclick="researchQuestion()" class="btn btn-outline text-sm">🔍 Research</button>
-        <button onclick="submitExamConfirm()" class="btn btn-danger">Submit Exam</button>
+        <button onclick="submitExamConfirm()" class="btn btn-danger">📤 Submit</button>
       </div>
     </div>
 
-    <!-- Question Palette -->
     <div class="mt-4 flex flex-wrap gap-1.5" id="questionPalette"></div>
   </div>
 
@@ -244,49 +329,47 @@
   <div id="resultPage" class="hide min-h-screen p-4 md:p-6 max-w-4xl mx-auto">
     <div class="text-center mb-6">
       <div class="text-5xl mb-3" id="resultIcon">✅</div>
-      <h1 class="text-2xl font-extrabold">Exam Submitted!</h1>
+      <h1 class="text-2xl font-extrabold">📝 Exam Submitted!</h1>
       <p class="text-lg mt-2" id="scoreText">Your Score: 0 / 0</p>
       <p class="text-sm opacity-50" id="resultExamName"></p>
     </div>
 
-    <!-- Stats Cards -->
     <div class="grid grid-cols-3 gap-3 mb-6">
-      <div class="card text-center"><p class="text-2xl font-bold" id="rCorrect">0</p><p class="text-xs opacity-50">Correct</p></div>
-      <div class="card text-center"><p class="text-2xl font-bold" id="rWrong">0</p><p class="text-xs opacity-50">Wrong</p></div>
-      <div class="card text-center"><p class="text-2xl font-bold" id="rPercentage">0%</p><p class="text-xs opacity-50">Score</p></div>
+      <div class="card text-center"><p class="text-2xl font-bold text-green-400" id="rCorrect">0</p><p class="text-xs opacity-50">Correct</p></div>
+      <div class="card text-center"><p class="text-2xl font-bold text-red-400" id="rWrong">0</p><p class="text-xs opacity-50">Wrong</p></div>
+      <div class="card text-center"><p class="text-2xl font-bold" id="rPercentage" style="color:#3b82f6">0%</p><p class="text-xs opacity-50">Score</p></div>
     </div>
 
-    <!-- Review Mode Toggle -->
-    <button onclick="toggleReview()" class="btn btn-outline w-full mb-4" id="reviewToggleBtn">📋 Review Answers</button>
+    <button onclick="toggleReview()" class="btn btn-outline w-full mb-4" id="reviewToggleBtn">📋 Review All Answers + Explanations</button>
     <div id="reviewArea" class="hide space-y-4"></div>
 
-    <div class="flex gap-2 mt-6">
-      <button onclick="goDashboard()" class="btn btn-primary flex-1">Back to Dashboard</button>
-      <button onclick="retakeExam()" class="btn btn-success flex-1">Retake</button>
+    <div class="flex gap-2 mt-4">
+      <button onclick="goDashboard()" class="btn btn-primary flex-1">📚 Back to Dashboard</button>
+      <button onclick="retakeExam()" class="btn btn-success flex-1">🔄 Retake</button>
     </div>
   </div>
 
   <!-- ===== RESEARCH MODAL ===== -->
   <div id="researchModal" class="modal-overlay hide">
     <div class="modal-content">
-      <h3 class="font-bold mb-2">🔍 Research</h3>
-      <p class="text-sm opacity-70 mb-3" id="researchQuestion">Question</p>
-      <input id="researchQuery" placeholder="Search query (e.g. 'photosynthesis')" class="mb-2">
+      <h3 class="font-bold mb-2">🔍 Research This Topic</h3>
+      <p class="text-sm opacity-70 mb-3" id="researchQuestionDisplay"></p>
+      <input id="researchQuery" placeholder="Search query..." class="mb-2">
       <div id="researchResult" class="text-sm opacity-80 mb-3 whitespace-pre-wrap max-h-40 overflow-y-auto"></div>
       <div class="flex gap-2">
-        <button onclick="doResearch()" class="btn btn-primary">Search</button>
+        <button onclick="doResearch()" class="btn btn-primary">🔍 Search</button>
         <button onclick="closeResearch()" class="btn btn-outline">Close</button>
       </div>
     </div>
   </div>
 
-  <!-- ===== CONFIRM SUBMIT MODAL ===== -->
+  <!-- ===== CONFIRM SUBMIT ===== -->
   <div id="confirmModal" class="modal-overlay hide">
     <div class="modal-content text-center">
       <div class="text-4xl mb-3">⚠️</div>
       <h3 class="font-bold text-lg mb-2">Submit Exam?</h3>
       <p class="text-sm opacity-70 mb-2" id="confirmUnanswered"></p>
-      <p class="text-sm opacity-50 mb-4">This action cannot be undone.</p>
+      <p class="text-sm opacity-50 mb-4">This cannot be undone.</p>
       <div class="flex gap-2 justify-center">
         <button onclick="submitExam()" class="btn btn-danger">Yes, Submit</button>
         <button onclick="closeConfirm()" class="btn btn-outline">Continue Exam</button>
@@ -294,8 +377,22 @@
     </div>
   </div>
 
+  <!-- ===== EXPLANATION MODAL ===== -->
+  <div id="explanationModal" class="modal-overlay hide">
+    <div class="modal-content" style="max-width:600px">
+      <div class="flex justify-between items-start mb-3">
+        <h3 class="font-bold text-lg">📖 Answer &amp; Explanation</h3>
+        <button onclick="closeExplanation()" class="text-lg opacity-50 hover:opacity-100 bg-transparent border-none cursor-pointer">✕</button>
+      </div>
+      <div id="explanationContent"></div>
+      <button onclick="closeExplanation()" class="btn btn-primary w-full mt-3">Continue</button>
+    </div>
+  </div>
+
   <script>
-    // ===== STATE =====
+    // ======================================================================
+    // STATE
+    // ======================================================================
     let currentUser = null;
     let courses = [];
     let currentExam = null;
@@ -307,10 +404,16 @@
     let submittedAnswers = {};
     let darkMode = true;
 
-    // ===== HELPERS =====
-    function $(id) { return document.getElementById(id); }
-    function show(id) { $(id).classList.remove('hide'); }
-    function hide(id) { $(id).classList.add('hide'); }
+    // Game state
+    let gameState = null; // { type, questions, currentIndex, score, correct, wrong, streak, bestStreak, timer }
+
+    // ======================================================================
+    // HELPERS
+    // ======================================================================
+    const $ = id => document.getElementById(id);
+    const show = id => $(id).classList.remove('hide');
+    const hide = id => $(id).classList.add('hide');
+
     function toast(msg, type = 'info') {
       const c = $('toastContainer');
       const t = document.createElement('div');
@@ -319,7 +422,10 @@
       t.style.color = 'white';
       t.textContent = msg;
       c.appendChild(t);
-      setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translateY(10px)'; t.style.transition = '0.3s'; setTimeout(() => t.remove(), 300); }, 3000);
+      setTimeout(() => {
+        t.style.opacity = '0'; t.style.transform = 'translateY(10px)';
+        t.style.transition = '0.3s'; setTimeout(() => t.remove(), 300);
+      }, 3000);
     }
 
     function toggleTheme() {
@@ -332,7 +438,7 @@
 
     function saveState() {
       if (!currentUser) return;
-      const data = { courses, examHistory: currentUser.examHistory || [] };
+      const data = { courses, gameStats: currentUser.gameStats || [] };
       localStorage.setItem('cbt_' + currentUser.name, JSON.stringify(data));
     }
 
@@ -342,42 +448,32 @@
       if (raw) {
         const data = JSON.parse(raw);
         courses = data.courses || [];
-        currentUser.examHistory = data.examHistory || [];
-      } else {
-        courses = [];
-        currentUser.examHistory = [];
-      }
+        currentUser.gameStats = data.gameStats || [];
+      } else { courses = []; currentUser.gameStats = []; }
     }
 
-    function getNextCourseId() {
-      return 'c_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
-    }
+    function getNextId(prefix) { return prefix + '_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4); }
 
-    function getNextExamId() {
-      return 'e_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
-    }
-
-    // ===== AUTH =====
+    // ======================================================================
+    // AUTH
+    // ======================================================================
     function handleLogin() {
       const name = $('loginName').value.trim();
       const pass = $('loginPass').value.trim();
       if (!name) { toast('Please enter your name', 'error'); return; }
       if (pass.length < 4) { toast('Password must be at least 4 characters', 'error'); return; }
 
-      // Load or create user
       const raw = localStorage.getItem('cbt_user_' + name);
       if (raw) {
         const saved = JSON.parse(raw);
         if (saved.password !== pass) { toast('Wrong password!', 'error'); return; }
-        currentUser = { name, password: pass, examHistory: saved.examHistory || [] };
+        currentUser = { name, password: pass, examHistory: saved.examHistory || [], gameStats: saved.gameStats || [] };
         toast('Welcome back, ' + name + '!', 'success');
       } else {
-        // New user
-        currentUser = { name, password: pass, examHistory: [] };
-        localStorage.setItem('cbt_user_' + name, JSON.stringify({ password: pass, examHistory: [] }));
+        currentUser = { name, password: pass, examHistory: [], gameStats: [] };
+        localStorage.setItem('cbt_user_' + name, JSON.stringify({ password: pass, examHistory: [], gameStats: [] }));
         toast('Account created!', 'success');
       }
-
       localStorage.setItem('cbt_loggedInUser', name);
       loadState();
       showDashboard();
@@ -386,23 +482,24 @@
     function logout() {
       clearInterval(timerInterval);
       localStorage.removeItem('cbt_loggedInUser');
-      currentUser = null;
-      courses = [];
-      hide('dashboardPage');
-      hide('examPage');
-      hide('resultPage');
-      show('loginPage');
-      toast('Logged out', 'info');
+      currentUser = null; courses = [];
+      hide('dashboardPage'); hide('examPage'); hide('resultPage'); hide('gamesPage');
+      show('loginPage'); toast('Logged out', 'info');
     }
 
-    // ===== DASHBOARD =====
-    function showDashboard() {
-      hide('loginPage');
-      hide('examPage');
-      hide('resultPage');
-      hide('addCourseModal');
-      hide('examSettingsModal');
+    function goDashboard() {
+      hide('resultPage'); hide('gamesPage'); hide('examPage');
+      isReviewMode = false;
+      updateDashboard();
+      show('dashboardPage');
+    }
 
+    // ======================================================================
+    // DASHBOARD
+    // ======================================================================
+    function showDashboard() {
+      hide('loginPage'); hide('examPage'); hide('resultPage'); hide('gamesPage');
+      hide('addCourseModal'); hide('examSettingsModal');
       $('userNameDisplay').textContent = currentUser.name;
       updateDashboard();
       show('dashboardPage');
@@ -410,20 +507,10 @@
 
     function updateDashboard() {
       $('courseCount').textContent = courses.length + ' course' + (courses.length !== 1 ? 's' : '');
+      const grid = $('courseGrid'); grid.innerHTML = '';
 
-      const grid = $('courseGrid');
-      grid.innerHTML = '';
-
-      if (courses.length === 0) {
-        show('emptyState');
-        hide('courseGrid');
-        hide('statsBar');
-        return;
-      }
-
-      hide('emptyState');
-      show('courseGrid');
-      show('statsBar');
+      if (courses.length === 0) { show('emptyState'); hide('courseGrid'); hide('statsBar'); return; }
+      hide('emptyState'); show('courseGrid'); show('statsBar');
 
       courses.forEach((c, i) => {
         const lastExam = c.exams && c.exams.length > 0 ? c.exams[c.exams.length - 1] : null;
@@ -431,8 +518,8 @@
         card.className = 'card cursor-pointer hover:opacity-80 relative';
         card.innerHTML = `
           <div class="flex justify-between items-start mb-2">
-            <h3 class="font-bold text-lg">${c.name}</h3>
-            <button onclick="deleteCourse(${i})" class="text-red-400 hover:text-red-300 text-lg" title="Delete course">✕</button>
+            <h3 class="font-bold text-lg">${escapeHtml(c.name)}</h3>
+            <button onclick="event.stopPropagation(); deleteCourse(${i})" class="text-red-400 hover:text-red-300 text-lg">✕</button>
           </div>
           <p class="text-xs opacity-50 mb-2">${c.questions ? c.questions.length : 0} questions</p>
           ${lastExam ? `<p class="text-xs opacity-70">Last: ${lastExam.score}/${lastExam.total} (${Math.round(lastExam.score/lastExam.total*100)}%)</p>` : '<p class="text-xs opacity-40">No exams taken yet</p>'}
@@ -445,16 +532,24 @@
         grid.appendChild(card);
       });
 
-      // Stats
-      let totalExams = 0;
-      let totalScore = 0;
-      let totalQ = 0;
-      courses.forEach(c => {
-        if (c.exams) { c.exams.forEach(e => { totalExams++; totalScore += e.score; totalQ += e.total; }); }
-      });
+      let totalExams = 0, totalScore = 0, totalQ = 0;
+      courses.forEach(c => { if (c.exams) c.exams.forEach(e => { totalExams++; totalScore += e.score; totalQ += e.total; }); });
       $('statCourses').textContent = courses.length;
       $('statExams').textContent = totalExams;
       $('statAvg').textContent = totalQ > 0 ? Math.round(totalScore / totalQ * 100) + '%' : '--';
+
+      // Game stats
+      const gs = currentUser.gameStats || [];
+      $('statGames').textContent = gs.length;
+      let bestStreak = 0;
+      gs.forEach(g => { if (g.streak && g.streak > bestStreak) bestStreak = g.streak; });
+      $('statStreak').textContent = bestStreak;
+    }
+
+    function escapeHtml(str) {
+      const d = document.createElement('div');
+      d.textContent = str;
+      return d.innerHTML;
     }
 
     function deleteCourse(index) {
@@ -467,53 +562,215 @@
 
     function viewCourseHistory(index) {
       const c = courses[index];
-      if (!c.exams || c.exams.length === 0) {
-        toast('No exam history for this course', 'info');
-        return;
-      }
-      let html = '<div class="card"><h3 class="font-bold mb-3">' + c.name + ' — Exam History</h3>';
-      c.exams.slice().reverse().forEach((e, i) => {
+      if (!c.exams || c.exams.length === 0) { toast('No exam history for this course', 'info'); return; }
+      let html = '<div class="card"><h3 class="font-bold mb-3">' + escapeHtml(c.name) + ' — Exam History</h3>';
+      c.exams.slice().reverse().forEach(e => {
         const pct = Math.round(e.score / e.total * 100);
         const color = pct >= 70 ? '#22c55e' : pct >= 40 ? '#f59e0b' : '#ef4444';
         html += '<div class="flex justify-between items-center py-2 border-b border-gray-700 last:border-0">';
-        html += '<span class="text-sm">' + new Date(e.date).toLocaleDateString() + ' — ' + e.type + '</span>';
-        html += '<span class="font-bold" style="color:' + color + '">' + e.score + '/' + e.total + ' (' + pct + '%)</span>';
-        html += '</div>';
+        html += '<span class="text-sm">' + new Date(e.date).toLocaleDateString() + ' — ' + (e.type || 'exam') + '</span>';
+        html += '<span class="font-bold" style="color:' + color + '">' + e.score + '/' + e.total + ' (' + pct + '%)</span></div>';
       });
       html += '</div>';
-      showToastModal('Exam History', html);
+      showModal('Exam History', html);
     }
 
-    function showToastModal(title, contentHtml) {
+    function showModal(title, contentHtml) {
       const overlay = document.createElement('div');
       overlay.className = 'modal-overlay';
       overlay.style.zIndex = '3000';
       overlay.innerHTML = '<div class="modal-content max-w-lg">' +
         '<div class="flex justify-between items-start mb-3"><h2 class="text-lg font-bold">' + title + '</h2>' +
-        '<button onclick="this.closest(\'.modal-overlay\').remove()" class="text-lg opacity-50 hover:opacity-100">✕</button></div>' +
+        '<button onclick="this.closest(\'.modal-overlay\').remove()" class="text-lg opacity-50 hover:opacity-100 bg-transparent border-none cursor-pointer">✕</button></div>' +
         contentHtml +
         '<button onclick="this.closest(\'.modal-overlay\').remove()" class="btn btn-outline w-full mt-3">Close</button></div>';
       overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
       document.body.appendChild(overlay);
     }
 
-    // ===== ADD COURSE =====
-    function showAddCourseModal() {
-      $('courseNameInput').value = '';
-      $('pdfUpload').value = '';
-      $('outlineInput').value = '';
-      $('pdfStatus').textContent = '';
-      show('addCourseModal');
+    // ======================================================================
+    // QUESTION GENERATION (UNIVERSITY STANDARD)
+    // ======================================================================
+    function generateUniversityQuestions(text, courseName, difficulty) {
+      const sentences = text.match(/[^.!?\n]+[.!?]/g) || text.split('\n').filter(s => s.trim().length > 15);
+      if (sentences.length < 2) return [];
+
+      const questions = [];
+      const difficultyLevel = difficulty || 'university';
+
+      // Extract key terms
+      const allWords = text.split(/\s+/).filter(w => w.length > 3).map(w => w.replace(/[^a-zA-Z0-9]/g, ''));
+      const uniqueTerms = [...new Set(allWords)].filter(w => /[A-Z]/.test(w.charAt(0)) || w.length > 5);
+
+      // Generate objective (MCQ) questions
+      for (let i = 0; i < sentences.length; i++) {
+        const sentence = sentences[i].trim();
+        const words = sentence.split(' ');
+        if (words.length < 6) continue;
+
+        // Find a key term to use
+        const keyTerms = sentence.match(/\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b/g) || [];
+        const term = keyTerms.length > 0 ? keyTerms[0] : words[Math.floor(words.length * 0.4)].replace(/[^a-zA-Z0-9]/g, '');
+
+        if (term.length < 3) continue;
+
+        // Generate blanks and make 4 options
+        const questionStem = sentence.replace(new RegExp(term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'), '________');
+        const distractors = generateDistractors(term, allWords, 3);
+
+        if (distractors.length === 3) {
+          const options = shuffleArray([term, ...distractors]);
+          let difficultyTag = difficultyLevel === 'expert' ? 'expert' : difficultyLevel === 'hard' ? 'hard' : 'standard';
+          questions.push({
+            type: 'objective',
+            question: questionStem,
+            options: options,
+            answer: term,
+            explanation: sentence,
+            difficulty: difficultyTag,
+            source: courseName
+          });
+        }
+      }
+
+      // Generate theory questions (What is, List, Highlight, Discuss)
+      const theoryTemplates = [
+        { prefix: 'What is', connector: 'and explain its significance in', suffix: '?' },
+        { prefix: 'Define', connector: 'as used in the context of', suffix: '.' },
+        { prefix: 'List and explain the', connector: 'of', suffix: '.' },
+        { prefix: 'Highlight the importance of', connector: 'in', suffix: '.' },
+        { prefix: 'Discuss the concept of', connector: 'with reference to', suffix: '.' },
+        { prefix: 'Compare and contrast', connector: 'and', suffix: ' as applied in ' + (courseName || 'engineering') + '.' },
+        { prefix: 'Critically analyze the role of', connector: 'in', suffix: '.' },
+        { prefix: 'Explain the principle of', connector: 'and how it relates to', suffix: '.' },
+      ];
+
+      for (let i = 0; i < Math.min(sentences.length, 12); i++) {
+        const sentence = sentences[i].trim();
+        const keyTerms = sentence.match(/\b[A-Z][a-z]+(?:\s+[A-Z][a-z]+)*\b/g) || [];
+        const keyNoun = keyTerms.length > 0 ? keyTerms[0] : sentence.split(' ').slice(0, 3).join(' ');
+
+        if (keyNoun.length < 3) continue;
+
+        const template = theoryTemplates[i % theoryTemplates.length];
+        const qText = template.prefix + ' ' + keyNoun + ' ' + template.connector + ' ' + (courseName || 'the subject') + template.suffix;
+
+        questions.push({
+          type: 'theory',
+          question: qText.charAt(0).toUpperCase() + qText.slice(1),
+          answer: sentence,
+          explanation: 'Key concept: ' + keyNoun + '. Full context: ' + sentence,
+          difficulty: difficultyLevel === 'expert' ? 'expert' : 'hard',
+          source: courseName
+        });
+      }
+
+      // Generate hierarchical questions (with sub-questions)
+      const hierarchical = [];
+      const grouped = chunkArray(sentences, 3);
+      for (let g = 0; g < Math.min(grouped.length, 8); g++) {
+        const group = grouped[g];
+        const mainTopic = group[0].split(' ').slice(0, 3).join(' ') || 'the topic';
+        const subQs = group.slice(0, 3).map((s, si) => ({
+          id: String.fromCharCode(97 + si),
+          text: (si === 0 ? 'What is ' : si === 1 ? 'Discuss the significance of ' : 'Explain how ') + s.split(' ').slice(0, 4).join(' ') + '...',
+          answer: s,
+          explanation: s
+        }));
+
+        // Sometimes add sub-sub-questions
+        if (g % 2 === 0 && subQs.length > 0) {
+          subQs[0].subItems = [
+            { id: 'i', text: 'What are the key characteristics of this concept?', answer: group[0], explanation: group[0] },
+            { id: 'ii', text: 'How does this relate to the broader field of ' + (courseName || 'study') + '?', answer: group.length > 1 ? group[1] : group[0], explanation: group.length > 1 ? group[1] : group[0] },
+          ];
+        }
+
+        hierarchical.push({
+          type: 'hierarchical',
+          question: (g === 0 ? 'Critically examine the concept of ' : g === 1 ? 'Analyze the principles governing ' : 'Evaluate the role of ') + mainTopic + ' in ' + (courseName || 'engineering practice') + '.',
+          subQuestions: subQs,
+          difficulty: 'hard',
+          source: courseName
+        });
+      }
+
+      questions.push(...hierarchical);
+
+      // Generate T/F statements for games
+      const tfStatements = [];
+      for (let i = 0; i < Math.min(sentences.length, 10); i++) {
+        const s = sentences[i].trim();
+        const modified = i % 3 === 0 ? flipStatement(s) : s;
+        tfStatements.push({
+          statement: modified.substring(0, 150),
+          isTrue: i % 3 !== 0,
+          explanation: s
+        });
+      }
+      questions._tfBank = tfStatements;
+
+      return shuffleArray(questions);
     }
 
+    function generateDistractors(correct, wordPool, count) {
+      const pool = wordPool.filter(w => w.toLowerCase() !== correct.toLowerCase() && w.length > 2);
+      const distractors = [];
+      const shuffled = shuffleArray(pool);
+      for (let w of shuffled) {
+        if (distractors.length >= count) break;
+        if (!distractors.includes(w)) distractors.push(w);
+      }
+      while (distractors.length < count) distractors.push(fallbackTerm(correct));
+      return distractors;
+    }
+
+    function fallbackTerm(original) {
+      const list = ['Parameter', 'Variable', 'Coefficient', 'Constant', 'Function', 'Component',
+        'Structure', 'System', 'Process', 'Mechanism', 'Principle', 'Characteristic'];
+      return list[Math.floor(Math.random() * list.length)];
+    }
+
+    function flipStatement(s) {
+      const negations = [' is ', ' are ', ' was ', ' were ', ' has ', ' have ', ' does ', ' do '];
+      for (let n of negations) {
+        if (s.includes(n)) {
+          return s.replace(n, n + 'not ');
+        }
+      }
+      return 'It is false that ' + s.charAt(0).toLowerCase() + s.slice(1);
+    }
+
+    function shuffleArray(arr) {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function chunkArray(arr, size) {
+      const result = [];
+      for (let i = 0; i < arr.length; i += size) result.push(arr.slice(i, i + size));
+      return result;
+    }
+
+    // ======================================================================
+    // ADD COURSE
+    // ======================================================================
+    function showAddCourseModal() {
+      $('courseNameInput').value = ''; $('pdfUpload').value = '';
+      $('outlineInput').value = ''; $('pdfStatus').textContent = '';
+      show('addCourseModal');
+    }
     function closeAddCourseModal() { hide('addCourseModal'); }
 
     async function parsePDF() {
       const file = $('pdfUpload').files[0];
       const courseName = $('courseNameInput').value.trim();
-      if (!file) { toast('Please select a PDF file', 'error'); return; }
-      if (!courseName) { toast('Please enter a course name', 'error'); return; }
-
+      if (!file) { toast('Select a PDF file', 'error'); return; }
+      if (!courseName) { toast('Enter a course name', 'error'); return; }
       $('pdfStatus').textContent = '📄 Reading PDF...';
       try {
         const arrayBuffer = await file.arrayBuffer();
@@ -524,152 +781,131 @@
           const content = await page.getTextContent();
           fullText += content.items.map(s => s.str).join(' ') + '\n';
         }
-        if (!fullText.trim()) { toast('Could not extract text from this PDF (maybe scanned?)', 'error'); $('pdfStatus').textContent = '❌ No text found'; return; }
-        $('pdfStatus').textContent = '✅ Extracted ' + fullText.split(' ').length + ' words. Generating questions...';
-        generateQuestionsFromText(courseName, fullText);
+        if (!fullText.trim()) { toast('Could not extract text (scanned PDF?)', 'error'); $('pdfStatus').textContent = '❌ No text'; return; }
+        $('pdfStatus').textContent = '✅ ' + fullText.split(' ').length + ' words. Generating questions...';
+        createCourseFromText(courseName, fullText);
       } catch (e) {
-        toast('Error reading PDF: ' + e.message, 'error');
-        $('pdfStatus').textContent = '❌ Error: ' + e.message;
+        toast('PDF error: ' + e.message, 'error');
+        $('pdfStatus').textContent = '❌ ' + e.message;
       }
     }
 
     async function generateFromOutline() {
       const outline = $('outlineInput').value.trim();
       const courseName = $('courseNameInput').value.trim();
-      if (!outline) { toast('Please paste a course outline', 'error'); return; }
-      if (!courseName) { toast('Please enter a course name', 'error'); return; }
-      $('pdfStatus').textContent = '📝 Generating questions from outline...';
-      generateQuestionsFromText(courseName, outline);
+      if (!outline) { toast('Paste a course outline', 'error'); return; }
+      if (!courseName) { toast('Enter a course name', 'error'); return; }
+      $('pdfStatus').textContent = '📝 Generating questions...';
+      createCourseFromText(courseName, outline);
     }
 
-    function generateQuestionsFromText(courseName, text) {
-      // Simple local question generation from text
-      const sentences = text.match(/[^.!?\n]+[.!?]/g) || text.split('\n').filter(s => s.trim().length > 20);
-      if (sentences.length < 3) {
-        toast('Text too short to generate questions (need at least 3 sentences)', 'error');
-        $('pdfStatus').textContent = '❌ Text too short';
-        return;
-      }
+    function createCourseFromText(courseName, text) {
+      const questions = generateUniversityQuestions(text, courseName, 'university');
+      // Separate main questions from TF bank
+      const tfBank = questions._tfBank || [];
+      delete questions._tfBank;
+      const mainQuestions = questions.filter(q => q.type);
 
-      const questions = [];
-      const shuffled = [...sentences].sort(() => Math.random() - 0.5);
-      const count = Math.min(shuffled.length, 15);
-
-      for (let i = 0; i < count; i++) {
-        const sentence = shuffled[i].trim();
-        const words = sentence.split(' ');
-        if (words.length < 5) continue;
-
-        // Pick a keyword to blank out
-        const keywordIdx = Math.floor(words.length * 0.3 + Math.random() * 0.4 * words.length);
-        const keyword = words[keywordIdx].replace(/[^a-zA-Z0-9]/g, '');
-        if (keyword.length < 3) continue;
-
-        // Generate wrong options
-        const wrongOptions = new Set();
-        const allWords = [...new Set(sentences.flatMap(s => s.split(' ').map(w => w.replace(/[^a-zA-Z0-9]/g, '').toLowerCase()).filter(w => w.length > 3)))];
-        const filtered = allWords.filter(w => w.toLowerCase() !== keyword.toLowerCase());
-        while (wrongOptions.size < 3 && filtered.length > 0) {
-          const rand = filtered[Math.floor(Math.random() * filtered.length)];
-          if (rand) wrongOptions.add(rand.charAt(0).toUpperCase() + rand.slice(1));
-        }
-        const options = [keyword, ...wrongOptions].sort(() => Math.random() - 0.5);
-
-        const qText = sentence.replace(new RegExp(keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'), '________');
-
-        questions.push({
-          question: qText,
-          options: options,
-          answer: keyword,
-          type: 'objective'
-        });
-      }
-
-      if (questions.length < 3) {
-        toast('Could not generate enough questions. Try a longer text.', 'error');
-        $('pdfStatus').textContent = '❌ Not enough questions generated';
+      if (mainQuestions.length < 3) {
+        toast('Not enough questions. Need more text.', 'error');
+        $('pdfStatus').textContent = '❌ Too few questions';
         return;
       }
 
       const course = {
-        id: getNextCourseId(),
+        id: getNextId('c'),
         name: courseName,
-        questions: questions,
+        questions: mainQuestions,
+        tfBank: tfBank,
         createdAt: new Date().toISOString(),
         exams: []
       };
-
       courses.push(course);
       saveState();
       closeAddCourseModal();
       updateDashboard();
-      toast('✅ Course "' + courseName + '" created with ' + questions.length + ' questions!', 'success');
+      toast('✅ "' + courseName + '" — ' + mainQuestions.length + ' questions created!', 'success');
     }
 
-    // ===== EXAM SETTINGS =====
+    // ======================================================================
+    // EXAM SETTINGS
+    // ======================================================================
     let examCourseIndex = -1;
 
     function openExamSettings(index) {
       examCourseIndex = index;
       const c = courses[index];
-      $('examCourseName').textContent = c.name;
+      $('examCourseName').textContent = c.name + ' (' + (c.questions?.length || 0) + ' questions)';
       $('examType').value = 'objective';
-      $('numQuestions').value = Math.min(c.questions.length, 10);
+      $('numQuestions').value = Math.min(c.questions?.length || 10, 10);
       $('examDuration').value = 30;
-      $('theoryFormat').value = 'text';
+      $('examDifficulty').value = 'university';
       show('examSettingsModal');
     }
-
     function closeExamSettings() { hide('examSettingsModal'); }
 
-    // ===== START EXAM =====
+    // ======================================================================
+    // START EXAM
+    // ======================================================================
     function startExam() {
       const c = courses[examCourseIndex];
-      if (!c) { toast('Course not found', 'error'); return; }
+      if (!c || !c.questions) { toast('Course not found', 'error'); return; }
 
       const type = $('examType').value;
       const numQ = parseInt($('numQuestions').value) || 10;
       const duration = parseInt($('examDuration').value) || 30;
-      const theoryFormat = $('theoryFormat').value;
+      const difficulty = $('examDifficulty').value;
 
-      // Select questions
-      const shuffled = [...c.questions].sort(() => Math.random() - 0.5);
+      // Filter by difficulty if needed
+      let pool = [...c.questions];
+      if (difficulty === 'hard') pool = pool.filter(q => q.difficulty === 'hard' || q.difficulty === 'expert');
+      else if (difficulty === 'expert') pool = pool.filter(q => q.difficulty === 'expert');
+      if (pool.length < 3) pool = [...c.questions];
+
+      const shuffled = shuffleArray(pool);
       let selected = shuffled.slice(0, Math.min(numQ, shuffled.length));
 
-      // For mixed, split half objective / half theory
-      if (type === 'mixed') {
-        const half = Math.ceil(selected.length / 2);
-        selected = selected.map((q, i) => ({ ...q, type: i < half ? 'objective' : 'theory' }));
-      } else if (type === 'theory') {
+      if (type === 'theory') {
         selected = selected.map(q => ({ ...q, type: 'theory' }));
-      } else {
-        selected = selected.map(q => ({ ...q, type: 'objective' }));
+      } else if (type === 'hierarchical') {
+        selected = selected.filter(q => q.type === 'hierarchical' || (q.subQuestions && q.subQuestions.length > 0));
+        if (selected.length < 3) selected = shuffled.slice(0, Math.min(numQ, shuffled.length)).map(q => {
+          if (q.type !== 'hierarchical') {
+            q.subQuestions = [{ id: 'a', text: 'Explain the concept in detail.', answer: q.answer || q.explanation || 'See explanation.', explanation: q.explanation || '' }];
+          }
+          return { ...q, type: 'hierarchical' };
+        });
+        selected = selected.slice(0, Math.min(numQ, selected.length));
+      } else if (type === 'mixed') {
+        const half = Math.ceil(selected.length / 2);
+        selected = selected.map((q, i) => {
+          if (i < half) return { ...q, type: 'objective' };
+          else if (q.type === 'hierarchical') return { ...q, type: 'hierarchical' };
+          else return { ...q, type: 'theory' };
+        });
       }
 
       currentExam = {
-        id: getNextExamId(),
+        id: getNextId('exam'),
         courseId: c.id,
         courseName: c.name,
         questions: selected,
         type: type,
-        theoryFormat: theoryFormat,
         startTime: Date.now(),
-        duration: duration * 60, // seconds
+        duration: duration * 60,
       };
-
       currentIndex = 0;
       answers = {};
       timeRemaining = currentExam.duration;
       isReviewMode = false;
 
-      hide('examSettingsModal');
-      hide('dashboardPage');
+      hide('examSettingsModal'); hide('dashboardPage');
       show('examPage');
-      $('examHeaderTitle').textContent = c.name + ' Exam';
+      $('examHeaderTitle').textContent = c.name + ' — ' + type.charAt(0).toUpperCase() + type.slice(1);
       showQuestion();
       startTimer();
 
-      // Load saved progress if any
+      // Restore saved progress
       const saved = localStorage.getItem('cbt_examProgress_' + currentExam.id);
       if (saved) {
         try {
@@ -679,113 +915,163 @@
           timeRemaining = p.timeRemaining || currentExam.duration;
           toast('📂 Restored saved progress', 'info');
           showQuestion();
-        } catch(e) {}
+        } catch (e) {}
       }
-
-      toast('Exam started! ' + currentExam.questions.length + ' questions, ' + duration + ' min', 'info');
+      toast('📝 ' + selected.length + ' questions, ' + duration + ' min', 'success');
     }
 
-    // ===== EXAM NAVIGATION =====
+    // ======================================================================
+    // EXAM NAVIGATION
+    // ======================================================================
     function showQuestion() {
       if (!currentExam || !currentExam.questions[currentIndex]) return;
       const q = currentExam.questions[currentIndex];
       const total = currentExam.questions.length;
 
       $('qNumBadge').textContent = 'Q' + (currentIndex + 1);
-      $('qTypeBadge').textContent = q.type === 'theory' ? 'Theory' : 'Objective';
-      $('qTypeBadge').className = 'tag ' + (q.type === 'theory' ? 'bg-purple-500 text-white' : 'bg-yellow-500 text-black');
+      $('qNumBadge').style.background = q.type === 'theory' ? '#8b5cf6' : q.type === 'hierarchical' ? '#f59e0b' : '#3b82f6';
+      let typeLabel = q.type === 'theory' ? 'Theory' : q.type === 'hierarchical' ? 'Hierarchical' : 'Objective';
+      $('qTypeBadge').textContent = typeLabel;
+      $('qTypeBadge').style.background = q.type === 'theory' ? '#8b5cf6' : q.type === 'hierarchical' ? '#f59e0b' : '#3b82f6';
+      $('qTypeBadge').style.color = 'white';
       $('questionText').textContent = q.question;
       $('examProgress').textContent = 'Question ' + (currentIndex + 1) + ' of ' + total;
       $('progressFill').style.width = ((currentIndex + 1) / total * 100) + '%';
 
-      // Objective options
-      const optDiv = $('objectiveOptions');
-      const theoryDiv = $('theoryAnswerArea');
-      const abcDiv = $('abcOptions');
+      const answerArea = $('questionAnswerArea');
+      const subContainer = $('subQuestionsContainer');
+      answerArea.innerHTML = '';
+      subContainer.innerHTML = '';
 
       if (q.type === 'objective' && q.options) {
-        optDiv.innerHTML = q.options.map((opt, i) => {
-          const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+        answerArea.innerHTML = '<div class="space-y-2" id="objOptions"></div>';
+        const optDiv = $('objOptions');
+        const letters = ['A', 'B', 'C', 'D', 'E', 'F'];
+        q.options.forEach((opt, i) => {
           const letter = letters[i] || '?';
           const isSelected = answers[currentIndex] === opt;
-          return '<button onclick="selectOption(' + currentIndex + ', \'' + opt.replace(/'/g, "\\'") + '\', this)" class="option-btn ' + (isSelected ? 'selected' : '') + '" data-opt="' + opt.replace(/"/g, '&quot;') + '">' + letter + ': ' + opt + '</button>';
-        }).join('');
-        show('objectiveOptions');
-        hide('theoryAnswerArea');
+          const btn = document.createElement('button');
+          btn.className = 'option-btn' + (isSelected ? ' selected' : '');
+          btn.textContent = letter + ': ' + opt;
+          btn.onclick = () => {
+            answers[currentIndex] = opt;
+            document.querySelectorAll('#objOptions .option-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            saveExamProgress();
+          };
+          optDiv.appendChild(btn);
+        });
       } else if (q.type === 'theory') {
-        hide('objectiveOptions');
-        show('theoryAnswerArea');
+        const saved = answers[currentIndex] || '';
+        answerArea.innerHTML = `
+          <label class="block text-sm font-medium mb-1">✍️ Your Answer:</label>
+          <textarea id="theoryAns" rows="4" placeholder="Type your answer here..." class="mb-2">${escapeHtml(saved)}</textarea>
+          <p class="text-xs opacity-50">You can check the answer + explanation after submission.</p>
+        `;
+        const ta = $('theoryAns');
+        if (ta) ta.oninput = () => { answers[currentIndex] = ta.value; };
+      } else if (q.type === 'hierarchical' && q.subQuestions) {
+        answerArea.innerHTML = '<p class="text-sm opacity-70 mb-2">✍️ Answer each sub-question:</p>';
+        q.subQuestions.forEach((sq, si) => {
+          const key = currentIndex + '_' + sq.id;
+          const saved = answers[key] || '';
+          const div = document.createElement('div');
+          div.className = 'sub-q';
+          let subHTML = '<div class="flex items-start mb-1"><span class="sub-q-letter">' + sq.id.toUpperCase() + '</span><span class="font-medium text-sm">' + sq.text + '</span></div>';
+          subHTML += '<textarea id="sq_' + key + '" rows="2" placeholder="Your answer..." class="text-sm">' + escapeHtml(saved) + '</textarea>';
+          div.innerHTML = subHTML;
+          answerArea.appendChild(div);
 
-        if (currentExam.theoryFormat === 'abc') {
-          show('abcOptions');
-          // Restore ABC answers if any
-          const saved = answers[currentIndex] || {};
-          $('ans_a').value = saved.a || '';
-          $('ans_b').value = saved.b || '';
-          $('ans_c').value = saved.c || '';
-        } else {
-          hide('abcOptions');
-          $('theoryAnswer').value = answers[currentIndex] || '';
-        }
+          // Sub-sub-questions
+          if (sq.subItems) {
+            sq.subItems.forEach((ssq, ssi) => {
+              const skey = key + '_' + ssq.id;
+              const ssaved = answers[skey] || '';
+              const sdiv = document.createElement('div');
+              sdiv.className = 'sub-q';
+              sdiv.style.marginLeft = '32px';
+              sdiv.style.borderLeftColor = '#8b5cf6';
+              sdiv.innerHTML = '<div class="flex items-start mb-1"><span class="sub-q-letter" style="background:#8b5cf6;color:white">' + ssq.id + '</span><span class="font-medium text-sm">' + ssq.text + '</span></div>' +
+                '<textarea id="sq_' + skey + '" rows="2" placeholder="Your answer..." class="text-sm">' + escapeHtml(ssaved) + '</textarea>';
+              answerArea.appendChild(sdiv);
+            });
+          }
+        });
+        // Auto-save hierarchical answers
+        answerArea.addEventListener('input', () => {
+          q.subQuestions.forEach((sq, si) => {
+            const key = currentIndex + '_' + sq.id;
+            const el = $('sq_' + key);
+            if (el) answers[key] = el.value;
+            if (sq.subItems) {
+              sq.subItems.forEach(ssq => {
+                const skey = key + '_' + ssq.id;
+                const sel = $('sq_' + skey);
+                if (sel) answers[skey] = sel.value;
+              });
+            }
+          });
+          saveExamProgress();
+        });
       }
 
-      // Update palette
       updatePalette();
-    }
-
-    function selectOption(index, value, btn) {
-      if (isReviewMode) return;
-      answers[index] = value;
-      // Update UI
-      document.querySelectorAll('#objectiveOptions .option-btn').forEach(b => b.classList.remove('selected'));
-      if (btn) btn.classList.add('selected');
-      saveExamProgress();
     }
 
     function saveTheoryAnswer() {
       if (!currentExam) return;
       const q = currentExam.questions[currentIndex];
-      if (!q || q.type !== 'theory') return;
-      if (currentExam.theoryFormat === 'abc') {
-        answers[currentIndex] = { a: $('ans_a').value, b: $('ans_b').value, c: $('ans_c').value };
-      } else {
-        answers[currentIndex] = $('theoryAnswer').value;
+      if (!q) return;
+      if (q.type === 'theory') {
+        const ta = $('theoryAns');
+        if (ta) answers[currentIndex] = ta.value;
+      } else if (q.type === 'hierarchical' && q.subQuestions) {
+        q.subQuestions.forEach(sq => {
+          const key = currentIndex + '_' + sq.id;
+          const el = $('sq_' + key);
+          if (el) answers[key] = el.value;
+          if (sq.subItems) {
+            sq.subItems.forEach(ssq => {
+              const skey = key + '_' + ssq.id;
+              const sel = $('sq_' + skey);
+              if (sel) answers[skey] = sel.value;
+            });
+          }
+        });
       }
     }
 
     function nextQuestion() {
       if (!currentExam) return;
       saveTheoryAnswer();
-      if (currentIndex < currentExam.questions.length - 1) {
-        currentIndex++;
-        showQuestion();
-      } else {
-        submitExamConfirm();
-      }
+      if (currentIndex < currentExam.questions.length - 1) { currentIndex++; showQuestion(); }
+      else submitExamConfirm();
     }
 
     function prevQuestion() {
       if (!currentExam) return;
       saveTheoryAnswer();
-      if (currentIndex > 0) {
-        currentIndex--;
-        showQuestion();
-      }
+      if (currentIndex > 0) { currentIndex--; showQuestion(); }
     }
 
     function goToQuestion(index) {
       saveTheoryAnswer();
-      if (index >= 0 && index < currentExam.questions.length) {
-        currentIndex = index;
-        showQuestion();
-      }
+      if (index >= 0 && index < currentExam.questions.length) { currentIndex = index; showQuestion(); }
     }
 
     function updatePalette() {
       const palette = $('questionPalette');
       if (!currentExam) { palette.innerHTML = ''; return; }
       palette.innerHTML = currentExam.questions.map((q, i) => {
-        const answered = answers[i] !== undefined && answers[i] !== null && answers[i] !== '';
+        let answered = false;
+        if (q.type === 'objective') answered = answers[i] !== undefined && answers[i] !== null && answers[i] !== '';
+        else if (q.type === 'theory') answered = answers[i] !== undefined && answers[i] !== null && answers[i].trim() !== '';
+        else if (q.type === 'hierarchical' && q.subQuestions) {
+          answered = q.subQuestions.every(sq => {
+            const val = answers[i + '_' + sq.id];
+            return val !== undefined && val !== null && val.trim() !== '';
+          });
+        }
         const isCurrent = i === currentIndex;
         let cls = 'w-8 h-8 rounded text-xs font-bold cursor-pointer transition-all ';
         if (isCurrent) cls += 'ring-2 ring-blue-400 ring-offset-2 ring-offset-gray-900 ';
@@ -795,19 +1081,15 @@
       }).join('');
     }
 
-    // ===== TIMER =====
+    // ======================================================================
+    // TIMER
+    // ======================================================================
     function startTimer() {
       if (timerInterval) clearInterval(timerInterval);
       timerInterval = setInterval(() => {
         timeRemaining--;
-        if (timeRemaining <= 0) {
-          clearInterval(timerInterval);
-          toast('⏰ Time is up! Submitting...', 'error');
-          submitExam();
-          return;
-        }
+        if (timeRemaining <= 0) { clearInterval(timerInterval); toast('⏰ Time up! Submitting...', 'error'); submitExam(); return; }
         updateTimerDisplay();
-        // Auto-save every 30s
         if (timeRemaining % 30 === 0) saveExamProgress();
       }, 1000);
       updateTimerDisplay();
@@ -817,42 +1099,36 @@
       const mins = Math.floor(timeRemaining / 60);
       const secs = timeRemaining % 60;
       $('timerDisplay').textContent = mins + ':' + secs.toString().padStart(2, '0');
-      // Color warning
-      if (timeRemaining < 60) $('timerDisplay').style.color = '#ef4444';
-      else if (timeRemaining < 300) $('timerDisplay').style.color = '#f59e0b';
-      else $('timerDisplay').style.color = '';
+      $('timerDisplay').style.color = timeRemaining < 60 ? '#ef4444' : timeRemaining < 300 ? '#f59e0b' : '';
     }
 
     function saveExamProgress() {
       if (!currentExam) return;
       saveTheoryAnswer();
-      const progress = {
-        answers: answers,
-        currentIndex: currentIndex,
-        timeRemaining: timeRemaining,
-        savedAt: Date.now()
-      };
-      localStorage.setItem('cbt_examProgress_' + currentExam.id, JSON.stringify(progress));
+      localStorage.setItem('cbt_examProgress_' + currentExam.id, JSON.stringify({
+        answers, currentIndex, timeRemaining, savedAt: Date.now()
+      }));
     }
 
-    // ===== SUBMIT =====
+    // ======================================================================
+    // SUBMIT EXAM
+    // ======================================================================
     function submitExamConfirm() {
-      const unanswered = currentExam.questions.filter((q, i) => {
-        if (q.type === 'theory' && currentExam.theoryFormat === 'abc') {
-          const a = answers[i] || {};
-          return !a.a && !a.b && !a.c;
+      if (!currentExam) return;
+      let unanswered = 0;
+      currentExam.questions.forEach((q, i) => {
+        if (q.type === 'objective') { if (!answers[i]) unanswered++; }
+        else if (q.type === 'theory') { if (!answers[i] || !answers[i].trim()) unanswered++; }
+        else if (q.type === 'hierarchical' && q.subQuestions) {
+          let allAnswered = q.subQuestions.every(sq => {
+            const v = answers[i + '_' + sq.id]; return v && v.trim() !== '';
+          });
+          if (!allAnswered) unanswered++;
         }
-        return answers[i] === undefined || answers[i] === null || answers[i] === '';
-      }).length;
-
-      if (unanswered > 0) {
-        $('confirmUnanswered').textContent = unanswered + ' question' + (unanswered > 1 ? 's' : '') + ' unanswered';
-      } else {
-        $('confirmUnanswered').textContent = 'All questions answered ✅';
-      }
+      });
+      $('confirmUnanswered').textContent = unanswered > 0 ? unanswered + ' question(s) unanswered' : 'All questions answered ✅';
       show('confirmModal');
     }
-
     function closeConfirm() { hide('confirmModal'); }
 
     function submitExam() {
@@ -861,66 +1137,100 @@
       saveTheoryAnswer();
       localStorage.removeItem('cbt_examProgress_' + currentExam.id);
 
-      let score = 0;
-      const total = currentExam.questions.length;
+      let score = 0, totalPoints = 0;
       const reviewData = [];
 
       currentExam.questions.forEach((q, i) => {
         let isCorrect = false;
+        let subResults = [];
+
         if (q.type === 'objective') {
           isCorrect = answers[i] === q.answer;
           if (isCorrect) score++;
+          totalPoints++;
+          reviewData.push({
+            question: q.question, type: 'objective', options: q.options,
+            correctAnswer: q.answer, userAnswer: answers[i] || '(none)',
+            isCorrect, explanation: q.explanation || 'No explanation provided.'
+          });
+        } else if (q.type === 'theory') {
+          totalPoints++;
+          const userAns = answers[i] || '';
+          // Award partial credit if answer has content
+          const hasContent = userAns.trim().length > 5;
+          isCorrect = hasContent;
+          if (hasContent) score++;
+          reviewData.push({
+            question: q.question, type: 'theory',
+            correctAnswer: q.answer, userAnswer: userAns || '(none)',
+            isCorrect, explanation: q.explanation || 'Correct answer: ' + q.answer
+          });
+        } else if (q.type === 'hierarchical' && q.subQuestions) {
+          let subCorrect = 0, subTotal = 0;
+          const subItems = [];
+          q.subQuestions.forEach(sq => {
+            const key = i + '_' + sq.id;
+            const val = answers[key] || '';
+            const hasContent = val.trim().length > 3;
+            if (hasContent) subCorrect++;
+            subTotal++;
+            subItems.push({ id: sq.id, question: sq.text, correctAnswer: sq.answer, userAnswer: val, isCorrect: hasContent });
+
+            if (sq.subItems) {
+              sq.subItems.forEach(ssq => {
+                const skey = key + '_' + ssq.id;
+                const sval = answers[skey] || '';
+                const sHas = sval.trim().length > 3;
+                if (sHas) subCorrect++;
+                subTotal++;
+                subItems.push({ id: ssq.id, question: ssq.text, correctAnswer: ssq.answer, userAnswer: sval, isCorrect: sHas });
+              });
+            }
+          });
+
+          // Average of sub-questions contributes to main score
+          const subPct = subTotal > 0 ? subCorrect / subTotal : 0;
+          totalPoints++;
+          if (subPct >= 0.5) score++;
+          reviewData.push({
+            question: q.question, type: 'hierarchical',
+            subItems, subCorrect, subTotal,
+            correctAnswer: 'See sub-answers above',
+            userAnswer: subCorrect + '/' + subTotal + ' sub-questions correct',
+            isCorrect: subPct >= 0.5,
+            explanation: q.subQuestions.map(sq => sq.explanation || '').join(' ')
+          });
         }
-        reviewData.push({
-          question: q.question,
-          type: q.type,
-          options: q.options,
-          correctAnswer: q.answer,
-          userAnswer: answers[i],
-          isCorrect: isCorrect,
-        });
       });
 
-      const pct = total > 0 ? Math.round(score / total * 100) : 0;
+      const pct = totalPoints > 0 ? Math.round(score / totalPoints * 100) : 0;
 
       // Save to course history
       const course = courses.find(c => c.id === currentExam.courseId);
       if (course) {
         if (!course.exams) course.exams = [];
         course.exams.push({
-          id: currentExam.id,
-          date: new Date().toISOString(),
-          type: currentExam.type,
-          score: score,
-          total: total,
-          percentage: pct,
-          reviewData: reviewData,
+          id: currentExam.id, date: new Date().toISOString(), type: currentExam.type,
+          score, total: totalPoints, percentage: pct, reviewData
         });
         saveState();
       }
 
-      // Save to user history
       if (!currentUser.examHistory) currentUser.examHistory = [];
       currentUser.examHistory.push({
-        id: currentExam.id,
-        course: currentExam.courseName,
-        date: new Date().toISOString(),
-        type: currentExam.type,
-        score: score,
-        total: total,
-        percentage: pct,
+        id: currentExam.id, course: currentExam.courseName, date: new Date().toISOString(),
+        type: currentExam.type, score, total: totalPoints, percentage: pct
       });
-      localStorage.setItem('cbt_user_' + currentUser.name, JSON.stringify({ password: currentUser.password, examHistory: currentUser.examHistory }));
+      localStorage.setItem('cbt_user_' + currentUser.name, JSON.stringify({
+        password: currentUser.password, examHistory: currentUser.examHistory, gameStats: currentUser.gameStats || []
+      }));
 
-      // Show results
       submittedAnswers = { ...answers };
-      showResults(score, total, pct, reviewData);
+      showResults(score, totalPoints, pct, reviewData);
     }
 
     function showResults(score, total, pct, reviewData) {
-      hide('examPage');
-      show('resultPage');
-
+      hide('examPage'); show('resultPage');
       $('resultExamName').textContent = currentExam.courseName + ' — ' + new Date().toLocaleString();
       $('rCorrect').textContent = score;
       $('rWrong').textContent = total - score;
@@ -931,33 +1241,26 @@
         $('scoreText').textContent = 'Excellent! ' + score + '/' + total + ' (' + pct + '%)';
         $('scoreText').style.color = '#22c55e';
       } else if (pct >= 40) {
-        $('resultIcon').textContent = '👍';
-        $('scoreText').textContent = 'Good effort! ' + score + '/' + total + ' (' + pct + '%)';
+        $('resultIcon').textContent = '📚';
+        $('scoreText').textContent = 'Keep going! ' + score + '/' + total + ' (' + pct + '%)';
         $('scoreText').style.color = '#f59e0b';
       } else {
         $('resultIcon').textContent = '💪';
-        $('scoreText').textContent = 'Keep practicing! ' + score + '/' + total + ' (' + pct + '%)';
+        $('scoreText').textContent = 'Study more! ' + score + '/' + total + ' (' + pct + '%)';
         $('scoreText').style.color = '#ef4444';
       }
 
-      // Build review data
       window._reviewData = reviewData;
       window._examQuestions = [...currentExam.questions];
       window._examAnswers = { ...submittedAnswers };
-
+      window._examCourseName = currentExam.courseName;
       currentExam = null;
     }
 
     function toggleReview() {
       isReviewMode = !isReviewMode;
-      if (isReviewMode) {
-        $('reviewToggleBtn').textContent = '📋 Hide Review';
-        show('reviewArea');
-        buildReview();
-      } else {
-        $('reviewToggleBtn').textContent = '📋 Review Answers';
-        hide('reviewArea');
-      }
+      if (isReviewMode) { $('reviewToggleBtn').textContent = '📋 Hide Review'; show('reviewArea'); buildReview(); }
+      else { $('reviewToggleBtn').textContent = '📋 Review All Answers + Explanations'; hide('reviewArea'); }
     }
 
     function buildReview() {
@@ -965,37 +1268,69 @@
       const area = $('reviewArea');
       area.innerHTML = rd.map((r, i) => {
         let html = '<div class="card mb-3 ' + (r.isCorrect ? 'border-l-4 border-l-green-500' : 'border-l-4 border-l-red-500') + '">';
-        html += '<p class="font-medium mb-2"><span class="text-xs opacity-50 mr-2">Q' + (i + 1) + '</span>' + r.question + '</p>';
-        html += '<p class="text-xs">Your answer: <span class="' + (r.isCorrect ? 'text-green-400' : 'text-red-400') + '">' + (r.userAnswer ? (typeof r.userAnswer === 'object' ? 'A: ' + (r.userAnswer.a||'-') + ', B: ' + (r.userAnswer.b||'-') + ', C: ' + (r.userAnswer.c||'-') : r.userAnswer) : '(unanswered)') + '</span></p>';
-        if (!r.isCorrect && r.type === 'objective') {
-          html += '<p class="text-xs text-green-400">Correct answer: ' + r.correctAnswer + '</p>';
+        html += '<p class="font-medium mb-2"><span class="text-xs opacity-50 mr-2">Q' + (i + 1) + '</span>' + escapeHtml(r.question) + '</p>';
+
+        if (r.type === 'objective') {
+          html += '<div class="text-sm space-y-1 mb-2">';
+          (r.options || []).forEach((opt, oi) => {
+            const letters = ['A', 'B', 'C', 'D'];
+            const isUserAns = opt === r.userAnswer;
+            const isCorrectAns = opt === r.correctAnswer;
+            let cls = 'opacity-70';
+            if (isCorrectAns) cls = 'text-green-400 font-bold';
+            else if (isUserAns && !isCorrectAns) cls = 'text-red-400';
+            html += '<p class="' + cls + '">' + (letters[oi] || '?') + ': ' + escapeHtml(opt) + (isCorrectAns ? ' ✅' : '') + '</p>';
+          });
+          html += '</div>';
+        } else if (r.type === 'theory') {
+          html += '<div class="text-sm mb-2">';
+          html += '<p><span class="opacity-50">Your answer:</span> <span class="' + (r.isCorrect ? 'text-green-400' : 'text-red-400') + '">' + escapeHtml(r.userAnswer) + '</span></p>';
+          html += '</div>';
+        } else if (r.type === 'hierarchical' && r.subItems) {
+          html += '<div class="text-sm mb-2 space-y-1">';
+          r.subItems.forEach(si => {
+            const clr = si.isCorrect ? 'text-green-400' : 'text-red-400';
+            html += '<p class="sub-q" style="margin-left:0;padding-left:8px"><span class="opacity-50">' + si.id.toUpperCase() + ':</span> ' + escapeHtml(si.question) + '<br><span class="' + clr + '">Your answer: ' + escapeHtml(si.userAnswer || '(none)') + '</span></p>';
+          });
+          html += '<p class="text-xs opacity-50 mt-1">Sub-questions: ' + r.subCorrect + '/' + r.subTotal + ' correct</p>';
+          html += '</div>';
         }
+
+        // Show correct answer + explanation
+        html += '<div class="bg-blue-900 bg-opacity-20 p-3 rounded-lg mt-2">';
+        html += '<p class="text-sm font-medium text-blue-300">✅ Correct Answer:</p>';
+        if (r.type === 'hierarchical' && r.subItems) {
+          html += '<div class="text-xs text-blue-200 space-y-1">';
+          r.subItems.forEach(si => {
+            html += '<p>' + si.id.toUpperCase() + ': ' + escapeHtml(si.correctAnswer) + '</p>';
+          });
+          html += '</div>';
+        } else {
+          html += '<p class="text-sm text-blue-200">' + escapeHtml(r.correctAnswer) + '</p>';
+        }
+        if (r.explanation && r.explanation !== r.correctAnswer) {
+          html += '<p class="text-xs text-blue-300 mt-1"><span class="font-medium">📖 Why:</span> ' + escapeHtml(r.explanation) + '</p>';
+        }
+        html += '</div>';
         html += '</div>';
         return html;
       }).join('');
     }
 
-    function goDashboard() {
-      hide('resultPage');
-      isReviewMode = false;
-      updateDashboard();
-      show('dashboardPage');
-    }
-
     function retakeExam() {
-      hide('resultPage');
-      isReviewMode = false;
-      // Find course index
-      const idx = courses.findIndex(c => c.name === (window._examCourseName || ''));
-      if (idx >= 0) { openExamSettings(idx); }
-      else { showDashboard(); toast('Open a course to retake', 'info'); }
+      hide('resultPage'); isReviewMode = false;
+      const idx = courses.findIndex(c => c.name === window._examCourseName);
+      if (idx >= 0) openExamSettings(idx);
+      else showDashboard();
     }
 
-    // ===== RESEARCH =====
+    // ======================================================================
+    // RESEARCH
+    // ======================================================================
     function researchQuestion() {
       if (!currentExam) return;
       const q = currentExam.questions[currentIndex];
-      $('researchQuestion').textContent = q.question;
+      $('researchQuestionDisplay').textContent = q.question;
       $('researchQuery').value = q.question.replace(/________/g, '').trim().substring(0, 100);
       $('researchResult').textContent = '';
       show('researchModal');
@@ -1005,30 +1340,322 @@
       const query = $('researchQuery').value.trim();
       if (!query) { toast('Enter a search query', 'error'); return; }
       $('researchResult').textContent = '🔍 Searching...';
-
       try {
-        const response = await fetch('https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(query));
-        if (response.ok) {
-          const data = await response.json();
-          $('researchResult').textContent = data.extract || 'No summary available.';
-        } else {
-          // Fallback: try DuckDuckGo
-          const ddgRes = await fetch('https://api.duckduckgo.com/?q=' + encodeURIComponent(query) + '&format=json&no_html=1');
-          if (ddgRes.ok) {
-            const ddgData = await ddgRes.json();
-            $('researchResult').textContent = ddgData.AbstractText || 'No results found.';
-          } else {
-            $('researchResult').textContent = 'Could not fetch research data. Try searching manually.';
-          }
+        const res = await fetch('https://en.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(query));
+        if (res.ok) { const d = await res.json(); $('researchResult').textContent = d.extract || 'No summary.'; }
+        else { const ddg = await fetch('https://api.duckduckgo.com/?q=' + encodeURIComponent(query) + '&format=json&no_html=1');
+          if (ddg.ok) { const dd = await ddg.json(); $('researchResult').textContent = dd.AbstractText || 'No results.'; }
+          else $('researchResult').textContent = 'Could not fetch. Try manual search.'; }
+      } catch (e) { $('researchResult').textContent = 'Offline. Try again later.'; }
+    }
+    function closeResearch() { hide('researchModal'); }
+    function closeExplanation() { hide('explanationModal'); }
+
+    // ======================================================================
+    // EDUCATIONAL GAMES
+    // ======================================================================
+    function showGamesPage() {
+      hide('dashboardPage'); hide('examPage'); hide('resultPage');
+      $('gameArea').classList.add('hide');
+      $('gameResults').classList.add('hide');
+      updateGameStats();
+      show('gamesPage');
+    }
+
+    function updateGameStats() {
+      const gs = currentUser.gameStats || [];
+      if (gs.length === 0) { $('gameStatsContent').textContent = 'Play a game to see your records! 🎮'; return; }
+      let bestScore = 0, bestAcc = 0, total = 0, correct = 0;
+      gs.forEach(g => {
+        total += g.total || 0; correct += g.correct || 0;
+        if (g.score > bestScore) bestScore = g.score;
+        if (g.total > 0 && (g.correct / g.total * 100) > bestAcc) bestAcc = Math.round(g.correct / g.total * 100);
+      });
+      let streak = 0;
+      gs.forEach(g => { if (g.streak > streak) streak = g.streak; });
+      $('gameStatsContent').innerHTML = '<div class="grid grid-cols-3 gap-3 text-center">' +
+        '<div><p class="text-lg font-bold text-yellow-400">' + gs.length + '</p><p class="text-xs opacity-50">Games</p></div>' +
+        '<div><p class="text-lg font-bold text-green-400">' + bestScore + '</p><p class="text-xs opacity-50">Best Score</p></div>' +
+        '<div><p class="text-lg font-bold text-purple-400">' + streak + '🔥</p><p class="text-xs opacity-50">Best Streak</p></div></div>';
+    }
+
+    function saveGameResult(type, score, total, correct, streak, bestStreak) {
+      if (!currentUser.gameStats) currentUser.gameStats = [];
+      currentUser.gameStats.push({ type, score, total, correct, streak, bestStreak, date: new Date().toISOString() });
+      const saved = JSON.parse(localStorage.getItem('cbt_user_' + currentUser.name) || '{}');
+      saved.gameStats = currentUser.gameStats;
+      localStorage.setItem('cbt_user_' + currentUser.name, JSON.stringify(saved));
+    }
+
+    // ── LIGHTNING ROUND ──
+    function startLightningRound() {
+      // Build questions from all courses
+      const allQs = [];
+      courses.forEach(c => {
+        if (c.questions) {
+          c.questions.filter(q => q.type === 'objective' && q.options).forEach(q => {
+            allQs.push({ ...q, source: c.name });
+          });
         }
-      } catch (e) {
-        $('researchResult').textContent = '🔌 Offline or network error. Try again later.';
+      });
+      if (allQs.length < 5) { toast('Need at least 5 objective questions across courses. Add more courses!', 'error'); return; }
+      const selected = shuffleArray(allQs).slice(0, 15);
+      gameState = {
+        type: 'lightning',
+        questions: selected,
+        currentIndex: 0,
+        score: 0,
+        correct: 0,
+        wrong: 0,
+        streak: 0,
+        bestStreak: 0,
+        timer: null,
+        timeLeft: 10,
+        total: selected.length,
+        answered: []
+      };
+      showGameUI('⚡ Lightning Round');
+    }
+
+    // ── TRUE/FALSE RUSH ──
+    function startTrueFalseRush() {
+      const allStatements = [];
+      courses.forEach(c => {
+        if (c.tfBank) c.tfBank.forEach(tf => allStatements.push({ ...tf, source: c.name }));
+        if (c.questions) {
+          c.questions.forEach(q => {
+            if (q.answer && q.question) {
+              allStatements.push({
+                statement: q.question.replace(/________/g, q.answer).substring(0, 150),
+                isTrue: true,
+                explanation: q.explanation || q.answer
+              });
+              // Generate a false variant
+              const falseSt = 'It is incorrect that ' + q.question.replace(/________/g, q.answer).substring(0, 130).toLowerCase();
+              allStatements.push({
+                statement: falseSt,
+                isTrue: false,
+                explanation: 'False. The correct answer is: ' + q.answer
+              });
+            }
+          });
+        }
+      });
+      if (allStatements.length < 5) { toast('Need more course content for T/F statements.', 'error'); return; }
+      const selected = shuffleArray(allStatements).slice(0, 20);
+      gameState = {
+        type: 'truefalse',
+        questions: selected,
+        currentIndex: 0,
+        score: 0,
+        correct: 0,
+        wrong: 0,
+        streak: 0,
+        bestStreak: 0,
+        timer: null,
+        timeLeft: 12,
+        total: selected.length,
+        answered: []
+      };
+      showGameUI('✅ True / False Rush');
+    }
+
+    // ── MATCH CHALLENGE ──
+    function startMatchChallenge() {
+      const pairs = [];
+      courses.forEach(c => {
+        if (c.questions) {
+          c.questions.forEach(q => {
+            const term = q.answer ? q.answer.split(' ').slice(0, 2).join(' ') : '';
+            if (term.length > 2 && q.explanation) {
+              pairs.push({ term, definition: q.explanation.substring(0, 100), source: c.name });
+            }
+          });
+        }
+      });
+      if (pairs.length < 4) { toast('Need more course content for matching.', 'error'); return; }
+      const selected = shuffleArray(pairs).slice(0, 8);
+      // Create a simplified quiz from pairs
+      const questions = selected.map(p => ({
+        question: 'What matches: "' + p.term + '"?',
+        options: shuffleArray(selected.map(x => x.definition)).slice(0, 4),
+        answer: p.definition,
+        explanation: p.term + ' — ' + p.definition
+      }));
+      // Ensure one correct option is in the mix
+      questions.forEach((q, i) => {
+        if (!q.options.includes(selected[i].definition)) {
+          q.options[0] = selected[i].definition;
+          q.options = shuffleArray(q.options);
+        }
+      });
+      gameState = {
+        type: 'match',
+        questions: questions,
+        currentIndex: 0,
+        score: 0,
+        correct: 0,
+        wrong: 0,
+        streak: 0,
+        bestStreak: 0,
+        timer: null,
+        timeLeft: 15,
+        total: questions.length,
+        answered: []
+      };
+      showGameUI('🧩 Match Challenge');
+    }
+
+    function showGameUI(title) {
+      $('gameArea').classList.remove('hide');
+      $('gameResults').classList.add('hide');
+      $('gameTimerLabel').textContent = title;
+      renderGameQuestion();
+    }
+
+    function renderGameQuestion() {
+      if (!gameState || gameState.currentIndex >= gameState.questions.length) {
+        finishGame();
+        return;
+      }
+      const q = gameState.questions[gameState.currentIndex];
+      const idx = gameState.currentIndex;
+
+      $('gameQuestion').textContent = q.question.substring(0, 200);
+      $('gameScore').textContent = 'Score: ' + gameState.score;
+      $('gameStreak').textContent = 'Streak: ' + gameState.streak + ' 🔥';
+      $('gameCountdown').textContent = gameState.timeLeft;
+      $('gameCountdown').style.borderColor = gameState.timeLeft <= 3 ? '#ef4444' : gameState.timeLeft <= 5 ? '#f59e0b' : '#22c55e';
+
+      // Options
+      const optDiv = $('gameOptions');
+      optDiv.innerHTML = '';
+      if (gameState.type === 'truefalse') {
+        ['True ✅', 'False ❌'].forEach(val => {
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = val;
+          btn.onclick = () => handleGameAnswer(val === 'True ✅');
+          optDiv.appendChild(btn);
+        });
+      } else if (q.options) {
+        q.options.forEach((opt, oi) => {
+          const letters = ['A', 'B', 'C', 'D'];
+          const btn = document.createElement('button');
+          btn.className = 'option-btn';
+          btn.textContent = (letters[oi] || '?') + ': ' + opt.substring(0, 100);
+          btn.onclick = () => handleGameAnswer(opt);
+          optDiv.appendChild(btn);
+        });
+      }
+
+      // Progress dots
+      const dots = $('gameProgressDots');
+      dots.innerHTML = gameState.questions.map((_, i) => {
+        const ans = gameState.answered[i];
+        let color = '#334155';
+        if (ans === true) color = '#22c55e';
+        else if (ans === false) color = '#ef4444';
+        else if (i === idx) color = '#3b82f6';
+        return '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:' + color + ';margin:0 2px"></span>';
+      }).join('');
+
+      // Start timer
+      if (gameState.timer) clearInterval(gameState.timer);
+      gameState.timeLeft = gameState.type === 'truefalse' ? 12 : gameState.type === 'match' ? 15 : 10;
+      gameState.timer = setInterval(() => {
+        gameState.timeLeft--;
+        $('gameCountdown').textContent = gameState.timeLeft;
+        $('gameCountdown').style.borderColor = gameState.timeLeft <= 3 ? '#ef4444' : gameState.timeLeft <= 5 ? '#f59e0b' : '#22c55e';
+        if (gameState.timeLeft <= 0) {
+          clearInterval(gameState.timer);
+          // Time's up = wrong
+          handleGameAnswer(null);
+        }
+      }, 1000);
+    }
+
+    function handleGameAnswer(selected) {
+      if (!gameState) return;
+      if (gameState.timer) clearInterval(gameState.timer);
+      const q = gameState.questions[gameState.currentIndex];
+      let isCorrect = false;
+
+      if (gameState.type === 'truefalse') {
+        isCorrect = (selected === q.isTrue);
+      } else {
+        isCorrect = (selected === q.answer);
+      }
+
+      gameState.answered[gameState.currentIndex] = isCorrect;
+      if (isCorrect) {
+        gameState.correct++;
+        gameState.streak++;
+        if (gameState.streak > gameState.bestStreak) gameState.bestStreak = gameState.streak;
+        gameState.score += 10 + (gameState.streak * 2); // Bonus for streaks!
+        toast('✅ Correct!', 'success');
+      } else {
+        gameState.wrong++;
+        gameState.streak = 0;
+        if (selected === null) toast('⏰ Time\'s up! ' + (q.answer || ''), 'error');
+        else toast('❌ Wrong. Answer: ' + (q.answer || 'N/A'), 'error');
+      }
+
+      gameState.currentIndex++;
+      if (gameState.currentIndex >= gameState.questions.length) {
+        finishGame();
+      } else {
+        renderGameQuestion();
       }
     }
 
-    function closeResearch() { hide('researchModal'); }
+    function finishGame() {
+      if (gameState.timer) clearInterval(gameState.timer);
+      $('gameArea').classList.add('hide');
+      $('gameResults').classList.remove('hide');
 
-    // ===== KEYBOARD SHORTCUTS =====
+      const total = gameState.total;
+      const pct = total > 0 ? Math.round(gameState.correct / total * 100) : 0;
+      $('gameRCorrect').textContent = gameState.correct;
+      $('gameRWrong').textContent = gameState.wrong;
+      $('gameRPct').textContent = pct + '%';
+      $('gameResultScore').textContent = 'Score: ' + gameState.score + ' | Streak: ' + gameState.bestStreak + '🔥';
+
+      if (pct >= 80) { $('gameResultIcon').textContent = '🏆'; $('gameResultTitle').textContent = 'Brilliant!'; }
+      else if (pct >= 50) { $('gameResultIcon').textContent = '🌟'; $('gameResultTitle').textContent = 'Great Job!'; }
+      else { $('gameResultIcon').textContent = '💪'; $('gameResultTitle').textContent = 'Keep Practicing!'; }
+
+      saveGameResult(gameState.type, gameState.score, total, gameState.correct, gameState.streak, gameState.bestStreak);
+      updateGameStats();
+      const gs = currentUser.gameStats || [];
+      let bestStreak = 0;
+      gs.forEach(g => { if (g.streak > bestStreak) bestStreak = g.streak; });
+      $('statStreak').textContent = bestStreak;
+      $('statGames').textContent = gs.length;
+
+      gameState = null;
+    }
+
+    function endGame() {
+      if (gameState && gameState.timer) clearInterval(gameState.timer);
+      gameState = null;
+      $('gameArea').classList.add('hide');
+      $('gameResults').classList.add('hide');
+    }
+
+    function restartGame() {
+      $('gameResults').classList.add('hide');
+      if (gameState) {
+        const type = gameState.type;
+        if (type === 'lightning') startLightningRound();
+        else if (type === 'truefalse') startTrueFalseRush();
+        else if (type === 'match') startMatchChallenge();
+      }
+    }
+
+    // ======================================================================
+    // KEYBOARD SHORTCUTS
+    // ======================================================================
     document.addEventListener('keydown', (e) => {
       if (e.ctrlKey && e.key === 's') { e.preventDefault(); saveExamProgress(); toast('Progress saved!', 'success'); }
       if (!currentExam) return;
@@ -1037,31 +1664,30 @@
       if (e.key === 'Escape') {
         if (!$('confirmModal').classList.contains('hide')) closeConfirm();
         if (!$('researchModal').classList.contains('hide')) closeResearch();
+        if (!$('explanationModal').classList.contains('hide')) closeExplanation();
       }
     });
 
-    // ===== INIT =====
+    // ======================================================================
+    // INIT
+    // ======================================================================
     window.onload = () => {
-      // Load theme
       const savedTheme = localStorage.getItem('cbtTheme') || 'dark';
       darkMode = savedTheme === 'dark';
       document.body.className = darkMode ? 'dark' : 'light';
       $('themeToggle').textContent = darkMode ? '🌙 Dark' : '☀️ Light';
       $('themeToggle2').textContent = darkMode ? '🌙' : '☀️';
 
-      // Auto-login if session exists
       const savedUser = localStorage.getItem('cbt_loggedInUser');
       if (savedUser) {
         const raw = localStorage.getItem('cbt_user_' + savedUser);
         if (raw) {
           const data = JSON.parse(raw);
-          currentUser = { name: savedUser, password: data.password, examHistory: data.examHistory || [] };
+          currentUser = { name: savedUser, password: data.password, examHistory: data.examHistory || [], gameStats: data.gameStats || [] };
           loadState();
           showDashboard();
           toast('Welcome back, ' + savedUser + '!', 'success');
-        } else {
-          localStorage.removeItem('cbt_loggedInUser');
-        }
+        } else { localStorage.removeItem('cbt_loggedInUser'); }
       }
     };
   </script>
