@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My CBT Portal - Personal</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style> body { font-family: 'Inter', sans-serif; }.hide { display: none; } </style>
+</head>
+<body class="bg-gray-100">
+
+<!-- PAGE 1: LOGIN / REGISTER -->
+<div id="loginPage" class="h-screen flex items-center justify-center">
+  <div class="bg-white p-8 rounded-xl shadow-lg w-96">
+    <h1 class="text-3xl font-bold text-center mb-2 text-blue-600">My CBT Portal</h1>
+    <p class="text-center text-gray-500 mb-6">100% Personal</p>
+    <input id="emailInput" type="email" placeholder="Enter Email" class="border p-3 w-full mb-3 rounded-lg">
+    <input id="passwordInput" type="password" placeholder="Create Password" class="border p-3 w-full mb-4 rounded-lg">
+    <button onclick="handleLogin()" class="bg-blue-600 hover:bg-blue-700 text-white w-full p-3 rounded-lg font-bold">Login / Create Account</button>
+  </div>
+</div>
+
+<!-- PAGE 2: DASHBOARD -->
+<div id="dashboardPage" class="hide p-6 max-w-5xl mx-auto">
+  <div class="flex justify-between items-center mb-6 bg-white p-4 rounded-lg shadow">
+    <h1 class="text-2xl font-bold">My Courses, <span id="studentName"></span></h1>
+    <div class="relative">
+      <button onclick="toggleMenu()" class="text-3xl">⋮</button>
+      <div id="menu" class="hide absolute right-0 mt-2 w-56 bg-white rounded shadow-lg z-10">
+        <button onclick="showAddCourse()" class="block w-full text-left px-4 py-2 hover:bg-gray-100">➕ Add Course</button>
+        <button onclick="logout()" class="block w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600">Logout</button>
+      </div>
+    </div>
+  </div>
+  <h2 class="text-xl font-semibold mb-4">Your Private Courses</h2>
+  <div id="courseList" class="grid md:grid-cols-3 gap-4"></div>
+</div>
+
+<!-- PAGE 2.5: ADD COURSE MODAL -->
+<div id="addCoursePage" class="hide fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+  <div class="bg-white p-6 rounded-xl w-96">
+    <h2 class="text-xl font-bold mb-4">Add New Course</h2>
+    <div class="mb-4">
+      <label class="font-bold">Option 1: Upload PDF</label>
+      <input id="pdfCourseName" placeholder="Course Name" class="border p-2 w-full mb-2 rounded">
+      <input id="pdfTopics" placeholder="Topics: CPU,RAM,OS" class="border p-2 w-full mb-2 rounded">
+      <input type="file" id="pdfFile" accept=".pdf" class="border p-2 w-full rounded">
+      <button onclick="generateFromPDF()" class="bg-purple-600 text-white px-4 py-2 rounded mt-2 w-full">Generate from PDF</button>
+    </div>
+    <div class="border-t pt-4">
+      <label class="font-bold">Option 2: Paste Course Outline</label>
+      <input id="manualCourseName" placeholder="Course Name" class="border p-2 w-full mb-2 rounded">
+      <textarea id="manualOutline" placeholder="Paste Course Outline here, 1 topic per line" class="border p-2 w-full h-24 mb-2 rounded"></textarea>
+      <button onclick="generateFromOutline()" class="bg-green-600 text-white px-4 py-2 rounded w-full">Generate from Outline</button>
+    </div>
+    <div id="genStatus" class="mt-2 text-sm"></div>
+    <button onclick="closeAddCourse()" class="mt-4 text-gray-600 w-full">Close</button>
+  </div>
+</div>
+
+<!-- PAGE 3: EXAM SETTINGS -->
+<div id="examSettingsPage" class="hide p-6 max-w-3xl mx-auto">
+  <div class="bg-white p-6 rounded-lg shadow">
+    <h2 class="text-xl font-bold mb-4">Exam Settings for <span id="settingsCourseName"></span></h2>
+    <div class="grid md:grid-cols-3 gap-4 mb-4">
+      <div><label class="font-bold">Type</label><select id="examType" class="border p-2 w-full rounded"><option value="objective">Objective</option><option value="theory">Theory</option></select></div>
+      <div><label class="font-bold">No of Questions</label><input id="questionCount" type="number" value="30" class="border p-2 w-full rounded"></div>
+      <div><label class="font-bold">Theory Format</label><select id="theoryFormat" class="border p-2 w-full rounded"><option value="direct">Direct</option><option value="abc">A B C</option></select></div>
+    </div>
+    <button onclick="startExamNow()" class="bg-blue-600 text-white px-6 py-3 rounded w-full">Start Exam</button>
+    <button onclick="goDashboard()" class="mt-2 text-gray-600 w-full">Back</button>
+  </div>
+</div>
+
+<!-- PAGE 4: EXAM -->
+<div id="examPage" class="hide p-6 max-w-3xl mx-auto">
+  <div class="flex justify-between items-center mb-4 bg-white p-4 rounded-lg shadow">
+    <h1 id="examTitle" class="text-xl font-bold"></h1><div id="timer" class="text-xl font-bold text-red-600"></div>
+  </div>
+  <div class="bg-white p-6 rounded-lg shadow">
+    <p id="progress" class="text-sm text-gray-500 mb-2"></p>
+    <h2 id="questionText" class="font-bold text-lg mb-4"></h2>
+    <div id="optionsDiv"></div><div id="theoryDiv"></div>
+    <button onclick="researchAnswer()" class="bg-yellow-500 text-white px-4 py-2 rounded mt-4 w-full">🔍 Research This Question</button>
+    <div id="researchResult" class="mt-4 p-3 bg-blue-50 rounded hide"></div>
+    <div class="flex gap-4 mt-6">
+      <button id="prevBtn" onclick="prevQuestion()" class="bg-gray-500 text-white px-4 py-2 rounded">Prev</button>
+      <button id="nextBtn" onclick="nextQuestion()" class="bg-blue-600 text-white px-4 py-2 rounded">Next</button>
+      <button onclick="submitExam()" class="bg-red-600 text-white px-4 py-2 rounded ml-auto">Submit</button>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE 5: RESULT -->
+<div id="resultPage" class="hide h-screen flex items-center justify-center">
+  <div class="bg-white p-8 rounded-xl shadow-lg text-center">
+    <h1 class="text-3xl font-bold mb-4">Exam Submitted!</h1>
+    <p id="scoreText" class="text-xl mb-6"></p>
+    <button onclick="goDashboard()" class="bg-blue-600 text-white px-6 py-3 rounded-lg">Back to Dashboard</button>
+  </div>
+</div>
+
+<script>
+let USERS = JSON.parse(localStorage.getItem('gatewordUsers')) || [];
+let currentUser = null, currentExam = null, currentIndex = 0, answers = {}, timerInterval = null, timeLeft = 0, selectedCourse = null;
+
+function saveAll() { localStorage.setItem('gatewordUsers', JSON.stringify(USERS)); }
+
+// ====== LOGIN ======
+function handleLogin() {
+  const email = document.getElementById('emailInput').value.trim();
+  const pass = document.getElementById('passwordInput').value.trim();
+  if(!email ||!pass) return alert("Enter email and password");
+
+  let user = USERS.find(u => u.email === email);
+  if(!user) { // create new account with empty courses
+    user = {email, pass, id: Date.now(), courses: []};
+    USERS.push(user);
+    saveAll();
+  } else if(user.pass!== pass) {
+    return alert("Wrong password");
+  }
+  currentUser = user;
+  localStorage.setItem('currentUser', JSON.stringify(user));
+  showDashboard();
+}
+
+// ====== DASHBOARD - SHOW ONLY MY COURSES ======
+function showDashboard() {
+  document.getElementById('loginPage').classList.add('hide');
+  document.getElementById('dashboardPage').classList.remove('hide');
+  document.getElementById('studentName').innerText = currentUser.email.split('@')[0];
+
+  const courseList = document.getElementById('courseList');
+  courseList.innerHTML = '';
+  if(currentUser.courses.length === 0) {
+    courseList.innerHTML = '<p class="text-gray-500">No courses yet. Click ⋮ to add one</p>';
+  }
+  currentUser.courses.forEach(c => {
+    courseList.innerHTML += `
+      <div class="bg-white p-5 rounded-lg shadow">
+        <h3 class="font-bold text-lg">${c.name}</h3>
+        <p class="text-sm">${c.objective.length} Obj, ${c.theory.length} Theory</p>
+        <button onclick="openExamSettings('${c.id}')" class="bg-blue-600 text-white px-4 py-2 rounded mt-3 w-full">Take Exam</button>
+        <button onclick="deleteCourse('${c.id}')" class="text-red-600 text-sm mt-2">Delete Course</button>
+      </div>
+    `;
+  });
+}
+
+function toggleMenu() { document.getElementById('menu').classList.toggle('hide'); }
+function showAddCourse() { toggleMenu(); document.getElementById('addCoursePage').classList.remove('hide'); }
+function closeAddCourse() { document.getElementById('addCoursePage').classList.add('hide'); }
+
+// ====== DELETE COURSE ======
+function deleteCourse(id) {
+  if(confirm("Delete this course?")) {
+    currentUser.courses = currentUser.courses.filter(c => c.id!== id);
+    saveAll(); showDashboard();
+  }
+}
+
+// ====== GENERATE FROM PDF ======
+async function generateFromPDF() {
+  const file = document.getElementById('pdfFile').files[0];
+  const name = document.getElementById('pdfCourseName').value;
+  const topics = document.getElementById('pdfTopics').value.split(',');
+  if(!file ||!name) return alert("Fill course name and select PDF");
+
+  document.getElementById('genStatus').innerText = "Reading PDF...";
+  const pdf = await pdfjsLib.getDocument(URL.createObjectURL(file)).promise;
+  createCourse(name, topics);
+  document.getElementById('genStatus').innerText = `Done! Created ${name}`;
+  setTimeout(() => { closeAddCourse(); showDashboard(); }, 1000);
+}
+
+// ====== GENERATE FROM OUTLINE ======
+function generateFromOutline() {
+  const name = document.getElementById('manualCourseName').value;
+  const outline = document.getElementById('manualOutline').value;
+  if(!name ||!outline) return alert("Fill course name and outline");
+  const topics = outline.split('\n').filter(t => t.trim()!== '');
+  createCourse(name, topics);
+  document.getElementById('genStatus').innerText = `Done! Created ${name}`;
+  setTimeout(() => { closeAddCourse(); showDashboard(); }, 1000);
+}
+
+function createCourse(name, topics) {
+  const id = name.toUpperCase().replace(/\s/g, '') + Date.now();
+  let course = {id, name, objective: [], theory: []};
+
+  topics.forEach(topic => {
+    for(let i=1; i<=5; i++) {
+      course.objective.push({ q: `${topic.trim()} - Q${i}`, options: ["A","B","C","D"], ans: 0 });
+    }
+    course.theory.push({ q: `Explain ${topic.trim()}`, a: "Point 1", b: "Point 2", c: "Point 3" });
+  });
+  currentUser.courses.push(course);
+  saveAll();
+}
+
+// ====== EXAM ======
+function openExamSettings(courseId) {
+  selectedCourse = currentUser.courses.find(c => c.id === courseId);
+  document.getElementById('settingsCourseName').innerText = selectedCourse.name;
+  document.getElementById('dashboardPage').classList.add('hide');
+  document.getElementById('examSettingsPage').classList.remove('hide');
+}
+
+function startExamNow() {
+  const type = document.getElementById('examType').value;
+  const count = parseInt(document.getElementById('questionCount').value);
+  currentExam = { course: selectedCourse, type, questions: selectedCourse[type].sort(() => 0.5 - Math.random()).slice(0, count) };
+  currentIndex = 0; answers = {};
+  timeLeft = type === 'objective'? 30 * 60 : 120 * 60;
+
+  document.getElementById('examSettingsPage').classList.add('hide');
+  document.getElementById('examPage').classList.remove('hide');
+  document.getElementById('examTitle').innerText = `${selectedCourse.name} - ${type.toUpperCase()}`;
+  showQuestion(); startTimer();
+}
+
+function startTimer() {
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    timeLeft--; const mins = Math.floor(timeLeft / 60); const secs = timeLeft % 60;
+    document.getElementById('timer').innerText = `Time: ${mins}:${secs < 10? '0' : ''}${secs}`;
+    if(timeLeft <= 0) submitExam();
+  }, 1000);
+}
+
+function showQuestion() {
+  const q = currentExam.questions[currentIndex];
+  document.getElementById('progress').innerText = `Question ${currentIndex+1} of ${currentExam.questions.length}`;
+  const theoryFormat = document.getElementById('theoryFormat').value;
+
+  if(currentExam.type === 'objective') {
+    document.getElementById('theoryDiv').innerHTML = '';
+    document.getElementById('questionText').innerText = `Q${currentIndex+1}: ${q.q}`;
+    let html = ''; q.options.forEach((opt, i) => {
+      const checked = answers[currentIndex] === i? 'bg-blue-200' : '';
+      html += `<button onclick="selectOption(${i})" class="block border p-3 w-full text-left mt-2 rounded ${checked}">${opt}</button>`;
+    });
+    document.getElementById('optionsDiv').innerHTML = html;
+  } else {
+    document.getElementById('optionsDiv').innerHTML = '';
+    if(theoryFormat === 'abc' && q.a) {
+      document.getElementById('questionText').innerText = `Q${currentIndex+1}: ${q.q}`;
+      document.getElementById('theoryDiv').innerHTML = `
+        <p>a. ${q.a}</p><textarea id="ans_a" class="border w-full h-20 p-2 mb-2 rounded">${answers[currentIndex]?.a || ''}</textarea>
+        <p>b. ${q.b}</p><textarea id="ans_b" class="border w-full h-20 p-2 mb-2 rounded">${answers[currentIndex]?.b || ''}</textarea>
+        <p>c. ${q.c}</p><textarea id="ans_c" class="border w-full h-20 p-2 rounded">${answers[currentIndex]?.c || ''}</textarea>
+      `;
+    } else {
+      document.getElementById('questionText').innerText = `Q${currentIndex+1}: ${q.q}`;
+      document.getElementById('theoryDiv').innerHTML = `<textarea id="ans_direct" class="border w-full h-40 p-2 rounded">${answers[currentIndex] || ''}</textarea>`;
+    }
+  }
+}
+
+function researchAnswer() {
+  const q = currentExam.questions[currentIndex];
+  const url = `https://www.google.com/search?q=${encodeURIComponent(currentExam.course.name + " + q.q)}`;
+  document.getElementById('researchResult').classList.remove('hide');
+  document.getElementById('researchResult').innerHTML = `<a href="${url}" target="_blank" class="text-blue-600 underline">Open Google Search</a>`;
+}
+
+function selectOption(i) { answers[currentIndex] = i; showQuestion(); }
+function saveTheoryAnswer() {
+  const theoryFormat = document.getElementById('theoryFormat').value;
+  if(theoryFormat === 'abc') {
+    answers[currentIndex] = { a: document.getElementById('ans_a')?.value, b: document.getElementById('ans_b')?.value, c: document.getElementById('ans_c')?.value }
+  } else { answers[currentIndex] = document.getElementById('ans_direct')?.value; }
+}
+function nextQuestion() { if(currentExam.type === 'theory') saveTheoryAnswer(); if(currentIndex < currentExam.questions.length - 1) { currentIndex++; showQuestion(); } else { submitExam(); } }
+function prevQuestion() { if(currentExam.type === 'theory') saveTheoryAnswer(); if(currentIndex > 0) { currentIndex--; showQuestion(); } }
+
+function submitExam() {
+  clearInterval(timerInterval); if(currentExam.type === 'theory') saveTheoryAnswer();
+  let score = 0;
+  if(currentExam.type === 'objective') {
+    currentExam.questions.forEach((q, i) => { if(answers[i] === q.ans) score++; });
+    document.getElementById('scoreText').innerText = `Your Score: ${score} / ${currentExam.questions.length}`;
+  } else { document.getElementById('scoreText').innerText = `Theory submitted.`; }
+  document.getElementById('examPage').classList.add('hide');
+  document.getElementById('resultPage').classList.remove('hide');
+}
+
+function goDashboard() {
+  document.getElementById('resultPage').classList.add('hide');
+  document.getElementById('examSettingsPage').classList.add('hide');
+  showDashboard();
+}
+function logout() { localStorage.removeItem('currentUser'); location.reload(); }
+
+window.onload = () => {
+  const saved = localStorage.getItem('currentUser');
+  if(saved) { currentUser = JSON.parse(saved); showDashboard(); }
+}
+</script>
+</body>
+</html>
